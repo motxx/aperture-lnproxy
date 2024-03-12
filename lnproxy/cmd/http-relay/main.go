@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/lnproxy/lnc"
-	"github.com/lnproxy/lnproxy-relay"
+	relay "github.com/lnproxy/lnproxy-relay"
 )
 
 var lnproxy_relay *relay.Relay

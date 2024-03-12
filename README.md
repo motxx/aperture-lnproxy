@@ -1,102 +1,45 @@
-# lnproxy-relay
+# Aperture lnproxy
 
-## Running a relay
+This project offers a dockerized solution for collecting fees on content delivery sites using the Lightning Network. It integrates Aperture, an HTTP 402 reverse proxy, and lnproxy, a wrapped invoice implementation, to enable seamless payment processing.
 
-This program uses the lnd REST API to handle lightning things so you'll need an lnd.conf with,
-for example:
+## Overview
 
-	restlisten=localhost:8080
+### Sequence diagram
 
-To configure the relay follow the usage instructions:
+![image](https://github.com/motxx/aperture-lnproxy/assets/5776910/cf67a363-717c-4115-9dd7-175a7658e61b)
 
-	usage: ./lnproxy [flags] lnproxy.macaroon
-	lnproxy.macaroon
-		Path to lnproxy macaroon. Generate it with:
-			lncli bakemacaroon --save_to lnproxy.macaroon
-				uri:/lnrpc.Lightning/DecodePayReq \
-				uri:/lnrpc.Lightning/LookupInvoice \
-				uri:/invoicesrpc.Invoices/AddHoldInvoice \
-				uri:/invoicesrpc.Invoices/SubscribeSingleInvoice \
-				uri:/invoicesrpc.Invoices/CancelInvoice \
-				uri:/invoicesrpc.Invoices/SettleInvoice \
-				uri:/routerrpc.Router/SendPaymentV2 \
-				uri:/routerrpc.Router/EstimateRouteFee \
-				uri:/chainrpc.ChainKit/GetBestBlock
-	-lnd string
-		host for lnd's REST api (default "https://127.0.0.1:8080")
-	-lnd-cert string
-		lnd's self-signed cert (set to empty string for no-rest-tls=true) (default ".lnd/tls.cert")
-	-port string
-		http port over which to expose api (default "4747")
+### Implementation summary
 
-Run the binary:
+* Fork lnproxy and add aperture
+* Implement a new challenger for aperture that supports lnproxy
+* Request lnurlp to get creator invoice
+* Implement docker compose files
 
-	$ ./lnproxy-http-relay-openbsd-amd64-00000000 lnproxy.macaroon
-	1970/01/01 00:00:00 HTTP server listening on: localhost:4747
+## Setup for lnproxy
 
-and on a separate terminal, test with:
+## Setup for aperture
 
-	curl -s --header "Content-Type: application/json" \
-		--request POST \
-		--data '{"invoice":"<bolt11 invoice>"}' \
-		http://localhost:4747/spec
+### .lnd/ directory
 
-## Expose your relay over tor
+* `./.lnd/tls.cert`
+* `./.lnd/data/chain/bitcoin/mainnet/invoice.macaroon`
 
-If you know how to run a server you can put your relay behind a reverse proxy and and expose it to the internet.
-A simpler route is to use tor.
+If you use Voltage Cloud, you can download `invoice.macaroon` by the following steps:
+* Voltage Cloud > Manage Access > Macaroon Bakery
+* Download `Type Invoice Default Invoice Macaroon`
 
-Install tor, then edit `/etc/tor/torrc` to add:
+### config/ directory
 
-	HiddenServiceDir /var/tor/lnproxy/
-	HiddenServicePort 80 127.0.0.1:4747
+* `./config/aperture.yaml`
 
-and run:
+### nginx/ directory
 
-	cat /var/tor/lnproxy.org/hostname
+Add TLS certifications for the hosting server domain (which is indicated as `l402.example.com` in `.example` files):
+* `./nginx/ssl/fullchain.pem`
+* `./nginx/ssl/privkey.pem`
 
-to get the onion url and try:
+## Run docker compose
 
-	torify curl -s --header "Content-Type: application/json" \
-		--request POST \
-		--data '{"invoice":"<bolt11 invoice>"}' \
-		http://<your .onion url>/spec
-
-Once you're happy with it, make a PR to add your url to: https://github.com/lnproxy/lnproxy-webui2/blob/main/assets/relays.json
-
-## Operating your relay
-
-Sending `SIGINT` (with Ctrl-C) to the running relay will cause it to shutdown the http server
-and stop accepting new invoices, it will wait for the last open invoice to expire, before fully shutting itself down.
-A second `SIGINT` will cancel all open invoices and cause the relay to shutdown immediately.
-
-When upgrading to the latest binaries, simply send one `SIGINT`
-and allow the program to shut itself down gracefully.
-It is safe to start the new binary immediately since the http server
-from the first binary will already have shut itself down.
-This way your relay can continue to proxy payments even while upgrading.
-
-### Recovering from errors
-
-If an unexpected error occurs when a payment to an original invoice is settled
-but the accepted proxy invoice payment is not yet settled,
-funds will be at risk.
-This lnproxy relay tries, wherever possible, to completely shutdown in this situation:
-if a single circuit does not complete as expected, the executable will
-shutdown and stop accepting new invoices or sending out new payments to settle
-active invoices.
-This ensures that at most `MaxAmountMsat` Bitcoin will be in a "limbo" state
-at any one time (the default value is 1,000,000 satoshis).
-
-Even if such an error occurs, and an lnproxy relay circuit ends up in a limbo state,
-it will almost certainly be possible to recover from the error manually.
-If you notice that your relay excutable has terminated
-(it's easy to set up an alert from this on *NIX systems by just adding
-another command to follow the lnproxy relay command in whatever script invokes it),
-you will have `CltvDeltaAlpha` blocks (by default about one day) to
-manually settle the proxy payment.
-To do this, simply use `lncli listinvoices` to find any invoices in the `ACCEPTED` state,
-and then lookup their associated payments using the payment hash (`r_hash`).
-If the payment was completed you should have a preimage you can use to
-settle the `ACCEPTED` invoice.  If the payment failed, no funds are at risk,
-you can cancel the hodl invoice.
+```
+docker compose up -d
+```

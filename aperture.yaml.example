@@ -1,0 +1,35 @@
+listenaddr: "0.0.0.0:8080"
+
+debuglevel: "trace"
+
+autocert: false
+servername: l402.example.com
+
+authenticator:
+  network: "mainnet"
+  lndhost: "lndhost.example.com"
+  tlspath: "/root/.lnd/tls.cert"
+  macdir: "/root/.lnd/data/chain/bitcoin/mainnet/"
+
+dbbackend: "postgres"
+postgres:
+  host: "db"
+  port: 5432
+  user: "postgres"
+  password: "test psql passw0rd"
+  dbname: "aperture"
+  maxconnections: 25
+  requireSSL: false
+
+services:
+  - name: "contents"
+    hostregexp: 'l402.example.com'
+    pathregexp: '^/content.*'
+    address: "contents:9000"
+    protocol: http
+    capabilities: "add,subtract"
+    timeout: 300
+    dynamicprice:
+      enabled: true
+      grpcaddress: contents:8083
+      insecure: true

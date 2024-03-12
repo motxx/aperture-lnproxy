@@ -1,0 +1,30 @@
+syntax="proto3";
+
+package contentrpc;
+
+option go_package = "./contentrpc";
+
+service Content {
+        rpc AddArticle(AddArticleRequest) returns (AddArticleResponse);
+        rpc AddQuote(AddQuoteRequest) returns (AddQuoteResponse);
+}
+
+message AddArticleRequest {
+        string title = 1;
+        string author = 2;
+        string content = 3;
+}
+
+message AddArticleResponse {
+        int64 id = 1;
+}
+
+message AddQuoteRequest {
+        string author = 1;
+        string content = 2;
+        int64 price = 3;
+}
+
+message AddQuoteResponse {
+        int64 id = 1;
+}

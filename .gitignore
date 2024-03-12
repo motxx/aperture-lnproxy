@@ -1,0 +1,8 @@
+db/
+!contents/db
+.env
+config/
+aperture.yaml
+.lnd/
+nginx/ssl/
+nginx/default.conf
