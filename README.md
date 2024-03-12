@@ -19,6 +19,14 @@ This project offers a dockerized solution for collecting fees on content deliver
 
 ## Setup for aperture
 
+* Add `.env`
+
+## Setup for contents
+
+* Setup AWS S3 bucket (currently only public bucket supported)
+* Add `.env`
+* Add `db.json`
+
 ### .lnd/ directory
 
 * `./.lnd/tls.cert`
