@@ -19,6 +19,9 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_CONTENTS_DB}
+  lnproxy:
+    build: ./lnproxy
+    restart: always
   aperture:
     build: ./aperture
     restart: always
@@ -27,6 +30,7 @@ services:
     depends_on:
       - db
       - contents
+      - lnproxy
     env_file:
       - .env
     volumes:
@@ -34,9 +38,6 @@ services:
       - ./config:/root/config
     ports:
       - "8080:8080"
-  lnproxy:
-    build: ./lnproxy
-    restart: always
   nginx:
     image: nginx:alpine
     volumes:

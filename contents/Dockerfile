@@ -16,7 +16,8 @@ EXPOSE 9000
 # Copy the binaries and entrypoint from the builder image.
 COPY --from=builder /go/bin/app /bin/
 COPY --from=builder /go/bin/appcli /bin/
-COPY --from=builder /app/db.json /
+COPY --from=builder /app/db.json /bin/
+COPY --from=builder /app/.env /bin/
 
 # Add bash and curl for debugging.
 RUN apk add --no-cache \

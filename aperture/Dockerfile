@@ -19,6 +19,7 @@ EXPOSE 9000
 
 # Copy the binaries and entrypoint from the builder image.
 COPY --from=builder /go/bin/aperture /bin/
+COPY --from=builder /app/.env /bin/
 
 # Add bash and curl for debugging.
 RUN apk add --no-cache \
