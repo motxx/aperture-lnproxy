@@ -8,6 +8,7 @@ WORKDIR /app
 # queries required to connect to linked containers succeed.
 ENV GODEBUG netdns=cgo
 
+RUN apk add make
 RUN make install
 
 FROM alpine as final
