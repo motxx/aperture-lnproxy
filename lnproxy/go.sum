@@ -1,4 +1,5 @@
-github.com/motxx/lnc v0.0.0-20240322104521-f2cb26660c70 h1:rsCtpRi3csuirrEawmxOMfO9qHDmoz+D4mymSMrXePY=
 github.com/motxx/lnc v0.0.0-20240322104521-f2cb26660c70/go.mod h1:kl7Q+HXsskdSKRcqHVoMnqOcYwD9SdYn/+OygdbDnxk=
+github.com/motxx/lnc v0.0.0-20240322124302-4065669f1749 h1:53v9WRmRv1wfQ3bWTYl5lPfokO8xejHF3e4+SzxfHlg=
+github.com/motxx/lnc v0.0.0-20240322124302-4065669f1749/go.mod h1:kl7Q+HXsskdSKRcqHVoMnqOcYwD9SdYn/+OygdbDnxk=
 golang.org/x/net v0.15.0 h1:ugBLEUaxABaB5AJqW9enI0ACdci2RUd4eP51NTBvuJ8=
 golang.org/x/net v0.15.0/go.mod h1:idbUs1IY1+zTqbi8yxTbhexhEEk5ur9LInksu6HrEpk=

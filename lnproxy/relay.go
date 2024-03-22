@@ -43,7 +43,7 @@ type RelayParameters struct {
 func NewRelay(ln lnc.LN) *Relay {
 	return &Relay{
 		RelayParameters: RelayParameters{
-			MinAmountMsat:      1_000,
+			MinAmountMsat:      10_000,
 			MaxAmountMsat:      1_000_000_000,
 			ExpiryBuffer:       300,
 			MaxExpiry:          604800, // 60*60*24*7 one week
@@ -58,7 +58,7 @@ func NewRelay(ln lnc.LN) *Relay {
 			MaxCltvExpiry: 1800,
 			MinCltvExpiry: 200,
 			// Should be set so that CltvDeltaAlpha blocks are very unlikely to be added before timeout
-			PaymentTimeout:        60,
+			PaymentTimeout:        600,
 			PaymentTimePreference: 0.9,
 		},
 		LN: ln,

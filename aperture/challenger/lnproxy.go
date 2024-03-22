@@ -270,9 +270,9 @@ type ProxyParameters struct {
 
 func (l *LnproxyChallenger) getRoutingMsat(amount_sats int64) *uint64 {
 	routingMsat := uint64(amount_sats * 3 / 100)
-	if routingMsat < 2000 {
-		two := uint64(2000)
-		return &two
+	if routingMsat < 10_000 {
+		minFeeSat := uint64(10_000)
+		return &minFeeSat
 	}
 	return &routingMsat
 }
@@ -357,19 +357,20 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 		return "", lntypes.ZeroHash, fmt.Errorf("error response: %s", errResp.Reason)
 	}
 
-	var wrappedInvoice string
-	err = json.Unmarshal(rawJSON, &LnproxySpecSuccessResponse{
-		WrappedInvoice: wrappedInvoice,
-	})
+	log.Info("Success response: ", string(rawJSON))
+	var resp LnproxySpecSuccessResponse
+	err = json.Unmarshal([]byte(rawJSON), &resp)
 	if err != nil {
 		return "", lntypes.ZeroHash, fmt.Errorf("error decoding success response: %v", err)
 	}
+	log.Info("Wrapped invoice: ", resp.WrappedInvoice)
 
-	paymentHash, err := extractPaymentHash(wrappedInvoice)
+	paymentHash, err := extractPaymentHash(resp.WrappedInvoice)
 	if err != nil {
 		log.Errorf("Error extracting payment hash: %v", err)
 		return "", lntypes.ZeroHash, fmt.Errorf("error extracting payment hash: %v", err)
 	}
+	log.Info("Payment hash: ", paymentHash)
 
 	return invoice, paymentHash, nil
 }
