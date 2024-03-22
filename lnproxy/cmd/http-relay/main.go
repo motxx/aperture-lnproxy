@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	relay "lnproxy"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,7 +20,6 @@ import (
 	"time"
 
 	"github.com/lnproxy/lnc"
-	relay "github.com/lnproxy/lnproxy-relay"
 )
 
 var lnproxy_relay *relay.Relay
