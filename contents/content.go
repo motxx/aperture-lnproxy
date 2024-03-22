@@ -73,7 +73,9 @@ func NewServer(ctx context.Context) (*Server, error) {
 }
 
 func (s *Server) SetupAWSConfig(ctx context.Context) error {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(s.conf.Region))
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion("ap-northeast-1"),
+	)
 	if err != nil {
 		return err
 	}

@@ -150,7 +150,7 @@ func main() {
 	http.HandleFunc("/spec", specApiHandler)
 
 	server := &http.Server{
-		Addr:              "localhost:" + *httpPort,
+		Addr:              "0.0.0.0:" + *httpPort,
 		ReadHeaderTimeout: 2 * time.Second,
 		ReadTimeout:       20 * time.Second,
 		WriteTimeout:      20 * time.Second,

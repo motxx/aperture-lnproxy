@@ -1,6 +1,7 @@
 FROM golang:1.22.1-alpine3.19 as builder
 
 COPY . /app
+COPY .env /app
 
 WORKDIR /app
 
@@ -13,13 +14,11 @@ RUN make install
 
 FROM alpine as final
 
-EXPOSE 8080
-EXPOSE 8083
-EXPOSE 9000
+EXPOSE 8081
 
 # Copy the binaries and entrypoint from the builder image.
 COPY --from=builder /go/bin/aperture /bin/
-COPY --from=builder /app/.env /bin/
+COPY --from=builder /app/.env .
 
 # Add bash and curl for debugging.
 RUN apk add --no-cache \
@@ -27,4 +26,4 @@ RUN apk add --no-cache \
     curl \
     ca-certificates
 
-ENTRYPOINT ["aperture"]
+ENTRYPOINT ["aperture", "--configfile", "~/config/aperture.yaml"]

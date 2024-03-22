@@ -8,6 +8,7 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 	"sync"
@@ -267,10 +268,10 @@ type ProxyParameters struct {
 	DescriptionHash *string `json:"description_hash"`
 }
 
-func (l *LnproxyChallenger) getRoutingMsat(price int64) *uint64 {
-	routingMsat := uint64(price * 3 / 100)
-	if routingMsat < 2 {
-		two := uint64(2)
+func (l *LnproxyChallenger) getRoutingMsat(amount_sats int64) *uint64 {
+	routingMsat := uint64(amount_sats * 3 / 100)
+	if routingMsat < 2000 {
+		two := uint64(2000)
 		return &two
 	}
 	return &routingMsat
@@ -295,11 +296,13 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 	lud16 := "moti@getalby.com"
 	lu, err := lnurl.NewLnurl(lud16)
 	if err != nil {
+		log.Errorf("Error creating lnurl: %v", err)
 		return "", lntypes.ZeroHash, err
 	}
 
 	invoice, err := lu.GetInvoice(price)
 	if err != nil {
+		log.Errorf("Error getting invoice: %v", err)
 		return "", lntypes.ZeroHash, err
 	}
 
@@ -312,11 +315,17 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 	}
 	b, err := json.Marshal(p)
 	if err != nil {
-		return "", lntypes.ZeroHash, fmt.Errorf("Failed to marshal spec parameter", p)
+		log.Errorf("Failed to marshal spec parameter: %v", p)
+		return "", lntypes.ZeroHash, fmt.Errorf("failed to marshal spec parameter: %v", p)
 	}
 
-	lnproxyUrl := path.Join(conf.LnproxyUrl, "spec")
-	res, err := http.Post(lnproxyUrl, "application/json", bytes.NewReader(b))
+	u, err := url.Parse(conf.LnproxyUrl)
+	if err != nil {
+		log.Errorf("Failed to parse lnproxy url: %v", err)
+		return "", lntypes.ZeroHash, fmt.Errorf("failed to parse lnproxy url: %v", err)
+	}
+	u.Path = path.Join(u.Path, "spec")
+	res, err := http.Post(u.String(), "application/json", bytes.NewReader(b))
 	if err != nil {
 		return "", lntypes.ZeroHash, err
 	}
@@ -331,6 +340,7 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 
 	paymentHash, err := extractPaymentHash(wrappedInvoice)
 	if err != nil {
+		log.Errorf("Error extracting payment hash: %v", err)
 		return "", lntypes.ZeroHash, fmt.Errorf("error extracting payment hash: %v", err)
 	}
 

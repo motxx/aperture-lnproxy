@@ -1,21 +1,24 @@
 FROM golang:1.22.1-alpine3.19 as builder
 
-COPY . /app
+WORKDIR /src
 
-WORKDIR /app
+COPY go.mod .
+RUN go mod download
 
-# Force Go to use the cgo based DNS resolver. This is required to ensure DNS
-# queries required to connect to linked containers succeed.
-ENV GODEBUG netdns=cgo
+COPY . .
 
-RUN go install ./cmd/http-relay
+ENV GODEBUG=netdns=cgo
+RUN go get lnproxy
+RUN go build cmd/http-relay/main.go
+RUN mv main lnproxy
 
 FROM alpine as final
 
 EXPOSE 4747
 
-# Copy the binaries and entrypoint from the builder image.
-COPY --from=builder /go/bin/http-relay /bin/
+ENV LND_HOST=${LND_HOST}
+ENV INVOICE_MACAROON_PATH=${INVOICE_MACAROON_PATH}
+ENV LND_CERT_PATH=${LND_CERT_PATH}
 
 # Add bash and curl for debugging.
 RUN apk add --no-cache \
@@ -23,4 +26,8 @@ RUN apk add --no-cache \
     curl \
     ca-certificates
 
-ENTRYPOINT ["http-relay"]
+COPY --from=builder /src/lnproxy /root/lnproxy
+COPY "${INVOICE_MACAROON_PATH}" "${INVOICE_MACAROON_PATH}"
+COPY "${LND_CERT_PATH}" "${LND_CERT_PATH}"
+
+ENTRYPOINT /root/lnproxy -lnd "${LND_HOST}" -lnd-cert "${LND_CERT_PATH}" "${INVOICE_MACAROON_PATH}"

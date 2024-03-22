@@ -31,6 +31,8 @@ This project offers a dockerized solution for collecting fees on content deliver
 
 * `./.lnd/tls.cert`
 * `./.lnd/data/chain/bitcoin/mainnet/invoice.macaroon`
+* `./lnproxy/.lnd/tls.cert`
+* `./lnproxy/.lnd/data/chain/bitcoin/mainnet/invoice.macaroon`
 
 If you use Voltage Cloud, you can download `invoice.macaroon` by the following steps:
 * Voltage Cloud > Manage Access > Macaroon Bakery
@@ -39,6 +41,12 @@ If you use Voltage Cloud, you can download `invoice.macaroon` by the following s
 ### config/ directory
 
 * `./config/aperture.yaml`
+* Change the following values:
+  * `authenticator`
+  * `servername`
+    * e.g. `l402.example.com`
+  * `services.hostregexp`
+    * e.g. `l402.example.com`
 
 ### nginx/ directory
 

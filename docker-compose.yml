@@ -17,11 +17,15 @@ services:
   contents:
     build: ./contents
     restart: always
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_CONTENTS_DB}
+    env_file:
+      - ./contents/.env
   lnproxy:
     build: ./lnproxy
     restart: always
+    volumes:
+      - ./.lnd:/root/.lnd
+    env_file:
+      - ./lnproxy/.env
   aperture:
     build: ./aperture
     restart: always
@@ -32,12 +36,12 @@ services:
       - contents
       - lnproxy
     env_file:
-      - .env
+      - ./aperture/.env
     volumes:
       - ./.lnd:/root/.lnd
       - ./config:/root/config
     ports:
-      - "8080:8080"
+      - "8081:8081"
   nginx:
     image: nginx:alpine
     volumes:
