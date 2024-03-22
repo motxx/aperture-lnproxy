@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lnproxy/lnc"
+	"github.com/motxx/lnc"
 )
 
 var ClientFacing = errors.New("")

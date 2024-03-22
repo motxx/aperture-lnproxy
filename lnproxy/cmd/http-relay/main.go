@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lnproxy/lnc"
+	"github.com/motxx/lnc"
 )
 
 var lnproxy_relay *relay.Relay
