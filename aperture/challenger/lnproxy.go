@@ -277,8 +277,18 @@ func (l *LnproxyChallenger) getRoutingMsat(amount_sats int64) *uint64 {
 	return &routingMsat
 }
 
+type LnproxySpecErrorResponse struct {
+	Status string `json:"status"`
+	Reason string `json:"reason"`
+}
+
+type LnproxySpecSuccessResponse struct {
+	WrappedInvoice string `json:"proxy_invoice"`
+}
+
 // NewChallenge creates a new LSAT payment challenge, returning a payment
 // request (invoice) and the corresponding payment hash.
+// The price is given in satoshis.
 //
 // NOTE: This is part of the mint.Challenger interface.
 func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
@@ -331,12 +341,29 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 	}
 	defer res.Body.Close()
 
+	var rawJSON json.RawMessage
+	err = json.NewDecoder(res.Body).Decode(&rawJSON)
+	if err != nil {
+		log.Errorf("Error unmarshaling response: %v", err)
+		return "", lntypes.ZeroHash, fmt.Errorf("error unmarshaling response: %v", err)
+	}
+
+	if bytes.Contains(rawJSON, []byte("ERROR")) {
+		var errResp LnproxySpecErrorResponse
+		err := json.Unmarshal(rawJSON, &errResp)
+		if err != nil {
+			return "", lntypes.ZeroHash, fmt.Errorf("error decoding error response: %v", err)
+		}
+		return "", lntypes.ZeroHash, fmt.Errorf("error response: %s", errResp.Reason)
+	}
+
 	var wrappedInvoice string
-	json.NewDecoder(res.Body).Decode(struct {
-		WrappedInvoice string `json:"proxy_invoice"`
-	}{
+	err = json.Unmarshal(rawJSON, &LnproxySpecSuccessResponse{
 		WrappedInvoice: wrappedInvoice,
 	})
+	if err != nil {
+		return "", lntypes.ZeroHash, fmt.Errorf("error decoding success response: %v", err)
+	}
 
 	paymentHash, err := extractPaymentHash(wrappedInvoice)
 	if err != nil {

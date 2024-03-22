@@ -3,7 +3,6 @@ package lnurl
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -67,7 +66,6 @@ func NewLnurl(lud16 string) (*Lnurl, error) {
 }
 
 func (l *Lnurl) GetInvoice(amount_sats int64) (string, error) {
-	log.Printf("lnurl: %s", l.Lnurl)
 	resp, err := http.Get(l.Lnurl)
 	if err != nil {
 		return "", err
