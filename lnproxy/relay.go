@@ -43,7 +43,7 @@ type RelayParameters struct {
 func NewRelay(ln lnc.LN) *Relay {
 	return &Relay{
 		RelayParameters: RelayParameters{
-			MinAmountMsat:      10_000,
+			MinAmountMsat:      1_000,
 			MaxAmountMsat:      1_000_000_000,
 			ExpiryBuffer:       300,
 			MaxExpiry:          604800, // 60*60*24*7 one week
