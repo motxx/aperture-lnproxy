@@ -310,9 +310,9 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 		return "", lntypes.ZeroHash, err
 	}
 
-	invoice, err := lu.GetInvoice(price)
+	creatorInvoice, err := lu.GetInvoice(price)
 	if err != nil {
-		log.Errorf("Error getting invoice: %v", err)
+		log.Errorf("Error getting creatorInvoice: %v", err)
 		return "", lntypes.ZeroHash, err
 	}
 
@@ -320,7 +320,7 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 	log.Infof("Price: %d, RoutingMsat: %d", price, *routingMsat)
 
 	p := ProxyParameters{
-		Invoice:     invoice,
+		Invoice:     creatorInvoice,
 		RoutingMsat: routingMsat,
 	}
 	b, err := json.Marshal(p)
@@ -372,7 +372,7 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 	}
 	log.Info("Payment hash: ", paymentHash)
 
-	return invoice, paymentHash, nil
+	return resp.WrappedInvoice, paymentHash, nil
 }
 
 func extractPaymentHash(invoice string) (lntypes.Hash, error) {
