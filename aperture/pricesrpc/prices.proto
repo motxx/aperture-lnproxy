@@ -16,6 +16,6 @@ message GetPaymentDetailsRequest {
 }
 
 message GetPaymentDetailsResponse {
-  string creator_lud16 = 1;
+  string recipient_lud16 = 1;
   int64 price_sats = 2;
 }

@@ -64,7 +64,7 @@
     "pricesrpcGetPaymentDetailsResponse": {
       "type": "object",
       "properties": {
-        "creator_lud16": {
+        "recipient_lud16": {
           "type": "string"
         },
         "price_sats": {
