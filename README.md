@@ -8,13 +8,6 @@ This project offers a dockerized solution for collecting fees on content deliver
 
 ![image](https://github.com/motxx/aperture-lnproxy/assets/5776910/cf67a363-717c-4115-9dd7-175a7658e61b)
 
-### Implementation summary
-
-* Fork lnproxy and add aperture
-* Implement a new challenger for aperture that supports lnproxy
-* Request lnurlp to get creator invoice
-* Implement docker compose files
-
 ## Setup for lnproxy
 
 ## Setup for aperture
@@ -58,4 +51,35 @@ Add TLS certifications for the hosting server domain (which is indicated as `l40
 
 ```
 docker compose up -d
+```
+
+## Use CLI for remote content server
+
+### Build CLI
+
+```
+cd contents
+make build-cli
+```
+
+### Run CLI
+
+```
+appcli --rpcserver=l402.example.com:8080 \
+  addcontent --id="avatar.png" --title="My Avatar" --author="moti" --filepath="under/the/s3/path/image.png" --recipient_lud16="moti@getalby.com" --price=30
+```
+
+```
+appcli --rpcserver=l402.example.com:8080 \
+  updatecontent --id="avatar.png" --title="My Avatar" --author="moti" --filepath="under/the/s3/path/image.png" --recipient_lud16="moti@getalby.com" --price=30
+```
+
+```
+appcli --rpcserver=l402.example.com:8080 \
+  removecontent --id="avatar.png"
+```
+
+```
+appcli --rpcserver=l402.example.com:8080 \
+  getcontent --id="avatar.png"
 ```
