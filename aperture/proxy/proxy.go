@@ -155,7 +155,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// resources.
 		acceptAuth := p.authenticator.Accept(&r.Header, resourceName)
 		if !acceptAuth {
-			price, err := target.pricer.GetPrice(r.Context(), r)
+			paymentDetails, err := target.pricer.GetPaymentDetails(r.Context(), r)
 			if err != nil {
 				prefixLog.Errorf("error getting "+
 					"resource price: %v", err)
@@ -169,12 +169,12 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			// If the price returned is zero, then break out of the
 			// switch statement and allow access to the service.
-			if price == 0 {
+			if paymentDetails.Price == 0 {
 				break
 			}
 
 			prefixLog.Infof("Authentication failed. Sending 402.")
-			p.handlePaymentRequired(w, r, resourceName, price)
+			p.handlePaymentRequired(w, r, resourceName, paymentDetails.RecipientLud16, paymentDetails.Price)
 			return
 		}
 
@@ -194,7 +194,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			if !ok {
-				price, err := target.pricer.GetPrice(
+				paymentDetails, err := target.pricer.GetPaymentDetails(
 					r.Context(), r,
 				)
 				if err != nil {
@@ -211,12 +211,12 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				// If the price returned is zero, then break
 				// out of the switch statement and allow access
 				// to the service.
-				if price == 0 {
+				if paymentDetails.Price == 0 {
 					break
 				}
 
 				p.handlePaymentRequired(
-					w, r, resourceName, target.Price,
+					w, r, resourceName, paymentDetails.RecipientLud16, target.Price,
 				)
 				return
 			}
@@ -396,12 +396,12 @@ func addCorsHeaders(header http.Header) {
 // handlePaymentRequired returns fresh challenge header fields and status code
 // to the client signaling that a payment is required to fulfil the request.
 func (p *Proxy) handlePaymentRequired(w http.ResponseWriter, r *http.Request,
-	serviceName string, servicePrice int64) {
+	serviceName string, serviceRecipientLud16 string, servicePrice int64) {
 
 	addCorsHeaders(r.Header)
 
 	header, err := p.authenticator.FreshChallengeHeader(
-		r, serviceName, servicePrice,
+		r, serviceName, serviceRecipientLud16, servicePrice,
 	)
 	if err != nil {
 		log.Errorf("Error creating new challenge header: %v", err)

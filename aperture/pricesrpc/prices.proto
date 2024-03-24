@@ -4,12 +4,18 @@ package pricesrpc;
 
 option go_package = "github.com/lightninglabs/aperture/pricesrpc";
 
-service Prices { rpc GetPrice(GetPriceRequest) returns (GetPriceResponse); }
+service Prices {
+  rpc GetPaymentDetails(GetPaymentDetailsRequest)
+      returns (GetPaymentDetailsResponse);
+}
 
-message GetPriceRequest {
+message GetPaymentDetailsRequest {
   string path = 1;
 
   string http_request_text = 2;
 }
 
-message GetPriceResponse { int64 price_sats = 1; }
+message GetPaymentDetailsResponse {
+  string creator_lud16 = 1;
+  int64 price_sats = 2;
+}

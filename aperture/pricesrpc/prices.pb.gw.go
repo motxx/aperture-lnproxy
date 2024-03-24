@@ -31,8 +31,8 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_Prices_GetPrice_0(ctx context.Context, marshaler runtime.Marshaler, client PricesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetPriceRequest
+func request_Prices_GetPaymentDetails_0(ctx context.Context, marshaler runtime.Marshaler, client PricesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetPaymentDetailsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -43,13 +43,13 @@ func request_Prices_GetPrice_0(ctx context.Context, marshaler runtime.Marshaler,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetPrice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetPaymentDetails(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Prices_GetPrice_0(ctx context.Context, marshaler runtime.Marshaler, server PricesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetPriceRequest
+func local_request_Prices_GetPaymentDetails_0(ctx context.Context, marshaler runtime.Marshaler, server PricesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetPaymentDetailsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -60,7 +60,7 @@ func local_request_Prices_GetPrice_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.GetPrice(ctx, &protoReq)
+	msg, err := server.GetPaymentDetails(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -71,18 +71,18 @@ func local_request_Prices_GetPrice_0(ctx context.Context, marshaler runtime.Mars
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterPricesHandlerFromEndpoint instead.
 func RegisterPricesHandlerServer(ctx context.Context, mux *runtime.ServeMux, server PricesServer) error {
 
-	mux.Handle("POST", pattern_Prices_GetPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Prices_GetPaymentDetails_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pricesrpc.Prices/GetPrice", runtime.WithHTTPPathPattern("/v1/aperture/price"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pricesrpc.Prices/GetPaymentDetails", runtime.WithHTTPPathPattern("/v1/aperture/price"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Prices_GetPrice_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Prices_GetPaymentDetails_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -90,7 +90,7 @@ func RegisterPricesHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 			return
 		}
 
-		forward_Prices_GetPrice_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Prices_GetPaymentDetails_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -135,23 +135,23 @@ func RegisterPricesHandler(ctx context.Context, mux *runtime.ServeMux, conn *grp
 // "PricesClient" to call the correct interceptors.
 func RegisterPricesHandlerClient(ctx context.Context, mux *runtime.ServeMux, client PricesClient) error {
 
-	mux.Handle("POST", pattern_Prices_GetPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Prices_GetPaymentDetails_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pricesrpc.Prices/GetPrice", runtime.WithHTTPPathPattern("/v1/aperture/price"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pricesrpc.Prices/GetPaymentDetails", runtime.WithHTTPPathPattern("/v1/aperture/price"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Prices_GetPrice_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Prices_GetPaymentDetails_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Prices_GetPrice_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Prices_GetPaymentDetails_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -159,9 +159,9 @@ func RegisterPricesHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_Prices_GetPrice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "aperture", "price"}, ""))
+	pattern_Prices_GetPaymentDetails_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "aperture", "price"}, ""))
 )
 
 var (
-	forward_Prices_GetPrice_0 = runtime.ForwardResponseMessage
+	forward_Prices_GetPaymentDetails_0 = runtime.ForwardResponseMessage
 )

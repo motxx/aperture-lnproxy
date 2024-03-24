@@ -11,8 +11,8 @@ import (
 
 var _ pricesrpc.PricesServer = (*Server)(nil)
 
-func (s *Server) GetPrice(ctx context.Context,
-	req *pricesrpc.GetPriceRequest) (*pricesrpc.GetPriceResponse, error) {
+func (s *Server) GetPaymentDetails(ctx context.Context,
+	req *pricesrpc.GetPaymentDetailsRequest) (*pricesrpc.GetPaymentDetailsResponse, error) {
 
 	if !strings.Contains(req.Path, "content") {
 		return nil, fmt.Errorf("no prices " +
@@ -27,7 +27,8 @@ func (s *Server) GetPrice(ctx context.Context,
 		return nil, err
 	}
 
-	return &pricesrpc.GetPriceResponse{
-		PriceSats: c.Price,
+	return &pricesrpc.GetPaymentDetailsResponse{
+		RecipientLud16: c.RecipientLud16,
+		PriceSats:      c.Price,
 	}, nil
 }

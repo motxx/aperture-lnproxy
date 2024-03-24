@@ -69,9 +69,9 @@ func NewGRPCPricer(cfg *Config) (*GRPCPricer, error) {
 	return &c, nil
 }
 
-// GetPrice queries the server for the price of a resource path and returns the
-// price. GetPrice is part of the Pricer interface.
-func (c GRPCPricer) GetPrice(ctx context.Context,
+// GetPaymentDetails queries the server for the creator lud16 and price of a resource path
+// and returns them. GetPaymentDetails is part of the Pricer interface.
+func (c GRPCPricer) GetPaymentDetails(ctx context.Context,
 	r *http.Request) (int64, error) {
 
 	var b bytes.Buffer
@@ -79,7 +79,7 @@ func (c GRPCPricer) GetPrice(ctx context.Context,
 		return 0, nil
 	}
 
-	resp, err := c.rpcClient.GetPrice(ctx, &pricesrpc.GetPriceRequest{
+	resp, err := c.rpcClient.GetPaymentDetails(ctx, &pricesrpc.GetGetPaymentDetailsRequest{
 		Path:            r.URL.Path,
 		HttpRequestText: b.String(),
 	})

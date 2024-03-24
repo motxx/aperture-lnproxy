@@ -3,6 +3,6 @@ config_version: 3
 
 http:
   rules:
-    - selector: pricesrpc.Prices.GetPrice
+    - selector: pricesrpc.Prices.GetPaymentDetails
       post: "/v1/aperture/price"
       body: "*"

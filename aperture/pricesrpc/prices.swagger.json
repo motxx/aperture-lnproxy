@@ -18,12 +18,12 @@
   "paths": {
     "/v1/aperture/price": {
       "post": {
-        "operationId": "Prices_GetPrice",
+        "operationId": "Prices_GetPaymentDetails",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pricesrpcGetPriceResponse"
+              "$ref": "#/definitions/pricesrpcGetPaymentDetailsResponse"
             }
           },
           "default": {
@@ -39,7 +39,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/pricesrpcGetPriceRequest"
+              "$ref": "#/definitions/pricesrpcGetPaymentDetailsRequest"
             }
           }
         ],
@@ -50,7 +50,7 @@
     }
   },
   "definitions": {
-    "pricesrpcGetPriceRequest": {
+    "pricesrpcGetPaymentDetailsRequest": {
       "type": "object",
       "properties": {
         "path": {
@@ -61,9 +61,12 @@
         }
       }
     },
-    "pricesrpcGetPriceResponse": {
+    "pricesrpcGetPaymentDetailsResponse": {
       "type": "object",
       "properties": {
+        "creator_lud16": {
+          "type": "string"
+        },
         "price_sats": {
           "type": "string",
           "format": "int64"

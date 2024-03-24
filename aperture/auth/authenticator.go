@@ -76,12 +76,13 @@ func (l *LsatAuthenticator) Accept(header *http.Header, serviceName string) bool
 //
 // NOTE: This is part of the Authenticator interface.
 func (l *LsatAuthenticator) FreshChallengeHeader(r *http.Request,
-	serviceName string, servicePrice int64) (http.Header, error) {
+	serviceName string, serviceRecipientLud16 string, servicePrice int64) (http.Header, error) {
 
 	service := lsat.Service{
-		Name:  serviceName,
-		Tier:  lsat.BaseTier,
-		Price: servicePrice,
+		Name:           serviceName,
+		Tier:           lsat.BaseTier,
+		RecipientLud16: serviceRecipientLud16,
+		Price:          servicePrice,
 	}
 	mac, paymentRequest, err := l.minter.MintLSAT(
 		context.Background(), service,

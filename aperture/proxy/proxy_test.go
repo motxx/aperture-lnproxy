@@ -315,7 +315,7 @@ func runGRPCTest(t *testing.T, tc *testCase) {
 	// auth response.
 	expectedHeaderContent, _ := mockAuth.FreshChallengeHeader(&http.Request{
 		Header: map[string][]string{},
-	}, "", 0)
+	}, "", "", 0)
 	capturedHeader := captureMetadata.Get("WWW-Authenticate")
 	require.Len(t, capturedHeader, 1)
 	require.Equal(

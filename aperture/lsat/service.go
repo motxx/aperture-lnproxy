@@ -52,6 +52,9 @@ type Service struct {
 	// Tier is the tier of the LSAT-enabled service.
 	Tier ServiceTier
 
+	// RecipientLud16 of service price recipient.
+	RecipientLud16 string
+
 	// Price of service LSAT in satoshis.
 	Price int64
 }

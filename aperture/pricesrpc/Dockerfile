@@ -1,4 +1,4 @@
-FROM golang:1.22.1-alpine3.19
+FROM golang:1.20.4-buster
 
 RUN apt-get update && apt-get install -y \
   git \

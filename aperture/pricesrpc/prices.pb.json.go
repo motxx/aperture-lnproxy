@@ -23,10 +23,10 @@ func RegisterPricesJSONCallbacks(registry map[string]func(ctx context.Context,
 		},
 	}
 
-	registry["pricesrpc.Prices.GetPrice"] = func(ctx context.Context,
+	registry["pricesrpc.Prices.GetPaymentDetails"] = func(ctx context.Context,
 		conn *grpc.ClientConn, reqJSON string, callback func(string, error)) {
 
-		req := &GetPriceRequest{}
+		req := &GetPaymentDetailsRequest{}
 		err := marshaler.Unmarshal([]byte(reqJSON), req)
 		if err != nil {
 			callback("", err)
@@ -34,7 +34,7 @@ func RegisterPricesJSONCallbacks(registry map[string]func(ctx context.Context,
 		}
 
 		client := NewPricesClient(conn)
-		resp, err := client.GetPrice(ctx, req)
+		resp, err := client.GetPaymentDetails(ctx, req)
 		if err != nil {
 			callback("", err)
 			return
