@@ -164,7 +164,6 @@ func (s *Server) contentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Printf("id: %s, Content: %v", id, content)
 
 	originalURL, err := url.Parse(
 		fmt.Sprintf(
@@ -178,7 +177,6 @@ func (s *Server) contentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Printf("originalURL: %s", originalURL.String())
 
 	req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, originalURL.String(), nil)
 	if err != nil {
@@ -195,7 +193,6 @@ func (s *Server) contentHandler(w http.ResponseWriter, r *http.Request) {
 
 	data, _ := ioutil.ReadAll(resp.Body)
 	sEnc := base64.StdEncoding.EncodeToString([]byte(data))
-	log.Printf("data: %v", sEnc)
 	defer resp.Body.Close()
 
 	w.Header().Set("Content-Type", "text/plain")
