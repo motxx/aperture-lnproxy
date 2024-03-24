@@ -10,22 +10,30 @@ This project offers a dockerized solution for collecting fees on content deliver
 
 ## Setup for lnproxy
 
+* Add `./lnproxy/.env`
+
 ## Setup for aperture
 
-* Add `.env`
+* Add `./aperture/.env`
 
 ## Setup for contents
 
 * Setup AWS S3 bucket (currently only public bucket supported)
-* Add `.env`
-* Add `db.json`
+* Add `./contents/.env`
 
 ### .lnd/ directory
 
-* `./.lnd/tls.cert`
-* `./.lnd/data/chain/bitcoin/mainnet/invoice.macaroon`
-* `./lnproxy/.lnd/tls.cert`
-* `./lnproxy/.lnd/data/chain/bitcoin/mainnet/invoice.macaroon`
+Add `.lnd/` directory to project root:
+```
+.lnd
+├── data
+│   └── chain
+│       └── bitcoin
+│           └── mainnet
+│               ├── admin.macaroon
+│               └── invoice.macaroon
+└── tls.cert
+```
 
 If you use Voltage Cloud, you can download `invoice.macaroon` by the following steps:
 * Voltage Cloud > Manage Access > Macaroon Bakery
@@ -33,8 +41,13 @@ If you use Voltage Cloud, you can download `invoice.macaroon` by the following s
 
 ### config/ directory
 
-* `./config/aperture.yaml`
-* Change the following values:
+* Add `aperture.yaml` under the `config/` directory:
+```
+config
+└── aperture.yaml
+```
+
+* Configure the following values in `aperture.yaml`:
   * `authenticator`
   * `servername`
     * e.g. `l402.example.com`
@@ -43,9 +56,15 @@ If you use Voltage Cloud, you can download `invoice.macaroon` by the following s
 
 ### nginx/ directory
 
-Add TLS certifications for the hosting server domain (which is indicated as `l402.example.com` in `.example` files):
-* `./nginx/ssl/fullchain.pem`
-* `./nginx/ssl/privkey.pem`
+Add `ssl/` directory under the `nginx/` directory:
+```
+nginx
+├── default.conf
+└── ssl
+    ├── fullchain.pem
+    └── privkey.pem
+```
+`ssl/` directory includes TLS certifications for the hosting server domain (which is indicated as `l402.example.com` in `.example` files).
 
 ## Run docker compose
 
