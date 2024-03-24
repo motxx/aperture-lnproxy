@@ -42,7 +42,6 @@ require (
 	gopkg.in/macaroon-bakery.v2 v2.1.0
 	gopkg.in/macaroon.v2 v2.1.0
 	gopkg.in/yaml.v2 v2.4.0
-	modernc.org/sqlite v1.20.3
 )
 
 require (

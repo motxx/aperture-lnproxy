@@ -24,6 +24,16 @@ var (
 	// fully executed yet. So this time needs to be chosen correctly to be
 	// longer than the longest expected individual test run time.
 	DefaultPostgresFixtureLifetime = 10 * time.Minute
+
+	// defaultMaxConns is the number of permitted active and idle
+	// connections. We want to limit this so it isn't unlimited. We use the
+	// same value for the number of idle connections as, this can speed up
+	// queries given a new connection doesn't need to be established each
+	// time.
+	defaultMaxConns = 25
+
+	// connIdleLifetime is the amount of time a connection can be idle.
+	connIdleLifetime = 5 * time.Minute
 )
 
 // PostgresConfig holds the postgres database configuration.
@@ -86,9 +96,6 @@ func NewPostgresStore(cfg *PostgresConfig) (*PostgresStore, error) {
 		// Now that the database is open, populate the database with
 		// our set of schemas based on our embedded in-memory file
 		// system.
-		//
-		// First, we'll need to open up a new migration instance for
-		// our current target database: sqlite.
 		driver, err := postgres_migrate.WithInstance(
 			rawDB, &postgres_migrate.Config{},
 		)

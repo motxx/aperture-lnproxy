@@ -206,8 +206,6 @@ func (t *TransactionExecutor[Q]) ExecTx(ctx context.Context,
 		}
 
 		// Commit transaction.
-		//
-		// TODO(roasbeef): need to handle SQLITE_BUSY here?
 		if err = tx.Commit(); err != nil {
 			return MapSQLError(err)
 		}

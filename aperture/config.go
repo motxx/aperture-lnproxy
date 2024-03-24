@@ -3,7 +3,6 @@ package aperture
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"github.com/btcsuite/btcd/btcutil"
@@ -20,14 +19,6 @@ var (
 	defaultLogFilename     = "aperture.log"
 	defaultMaxLogFiles     = 3
 	defaultMaxLogFileSize  = 10
-
-	defaultSqliteDatabaseFileName = "aperture.db"
-
-	// defaultSqliteDatabasePath is the default path under which we store
-	// the SQLite database file.
-	defaultSqliteDatabasePath = filepath.Join(
-		apertureDataDir, defaultSqliteDatabaseFileName,
-	)
 )
 
 const (
@@ -167,10 +158,7 @@ type Config struct {
 	ServeStatic bool `long:"servestatic" description:"Flag to enable or disable static content serving."`
 
 	// DatabaseBackend is the database backend to be used by the server.
-	DatabaseBackend string `long:"dbbackend" description:"The database backend to use for storing all asset related data." choice:"sqlite" choice:"postgres" yaml:"dbbackend"`
-
-	// Sqlite is the configuration section for the SQLite database backend.
-	Sqlite *aperturedb.SqliteConfig `group:"sqlite" namespace:"sqlite"`
+	DatabaseBackend string `long:"dbbackend" description:"The database backend to use for storing all asset related data." choice:"postgres" yaml:"dbbackend"`
 
 	// Postgres is the configuration section for the Postgres database backend.
 	Postgres *aperturedb.PostgresConfig `group:"postgres" namespace:"postgres"`
@@ -235,20 +223,11 @@ func (c *Config) validate() error {
 	return nil
 }
 
-// DefaultConfig returns the default configuration for a sqlite backend.
-func DefaultSqliteConfig() *aperturedb.SqliteConfig {
-	return &aperturedb.SqliteConfig{
-		SkipMigrations:   false,
-		DatabaseFileName: defaultSqliteDatabasePath,
-	}
-}
-
 // NewConfig initializes a new Config variable.
 func NewConfig() *Config {
 	return &Config{
 		DatabaseBackend: "etcd",
 		Etcd:            &EtcdConfig{},
-		Sqlite:          DefaultSqliteConfig(),
 		Postgres:        &aperturedb.PostgresConfig{},
 		Authenticator:   &AuthConfig{},
 		Tor:             &TorConfig{},

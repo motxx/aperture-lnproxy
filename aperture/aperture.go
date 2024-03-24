@@ -262,28 +262,6 @@ func (a *Aperture) Start(errChan chan error) error {
 		)
 		onionStore = aperturedb.NewOnionStore(dbOnionTxer)
 
-	case "sqlite":
-		db, err := aperturedb.NewSqliteStore(a.cfg.Sqlite)
-		if err != nil {
-			return fmt.Errorf("unable to connect to sqlite: %v",
-				err)
-		}
-		a.db = db.DB
-
-		dbSecretTxer := aperturedb.NewTransactionExecutor(db,
-			func(tx *sql.Tx) aperturedb.SecretsDB {
-				return db.WithTx(tx)
-			},
-		)
-		secretStore = aperturedb.NewSecretsStore(dbSecretTxer)
-
-		dbOnionTxer := aperturedb.NewTransactionExecutor(db,
-			func(tx *sql.Tx) aperturedb.OnionDB {
-				return db.WithTx(tx)
-			},
-		)
-		onionStore = aperturedb.NewOnionStore(dbOnionTxer)
-
 	default:
 		return fmt.Errorf("unknown database backend: %s",
 			a.cfg.DatabaseBackend)
