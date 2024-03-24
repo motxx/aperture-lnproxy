@@ -2,10 +2,10 @@ FROM golang:1.22.1-alpine3.19 as builder
 
 WORKDIR /src
 
-COPY go.mod .
+COPY ./lnproxy/go.mod .
 RUN go mod download
 
-COPY . .
+COPY ./lnproxy .
 
 ENV GODEBUG=netdns=cgo
 RUN go get lnproxy
@@ -17,7 +17,7 @@ FROM alpine as final
 EXPOSE 4747
 
 ENV LND_HOST=${LND_HOST}
-ENV INVOICE_MACAROON_PATH=${INVOICE_MACAROON_PATH}
+ENV ADMIN_MACAROON_PATH=${ADMIN_MACAROON_PATH}
 ENV LND_CERT_PATH=${LND_CERT_PATH}
 
 # Add bash and curl for debugging.
@@ -27,7 +27,7 @@ RUN apk add --no-cache \
     ca-certificates
 
 COPY --from=builder /src/lnproxy /root/lnproxy
-COPY "${INVOICE_MACAROON_PATH}" "${INVOICE_MACAROON_PATH}"
+COPY "${ADMIN_MACAROON_PATH}" "${ADMIN_MACAROON_PATH}"
 COPY "${LND_CERT_PATH}" "${LND_CERT_PATH}"
 
-ENTRYPOINT /root/lnproxy -lnd "${LND_HOST}" -lnd-cert "${LND_CERT_PATH}" "${INVOICE_MACAROON_PATH}"
+ENTRYPOINT /root/lnproxy -lnd "${LND_HOST}" -lnd-cert "${LND_CERT_PATH}" "${ADMIN_MACAROON_PATH}"
