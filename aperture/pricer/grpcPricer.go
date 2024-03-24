@@ -79,7 +79,7 @@ func (c GRPCPricer) GetPaymentDetails(ctx context.Context,
 		return 0, nil
 	}
 
-	resp, err := c.rpcClient.GetPaymentDetails(ctx, &pricesrpc.GetGetPaymentDetailsRequest{
+	resp, err := c.rpcClient.GetPaymentDetails(ctx, &pricesrpc.GetPaymentDetailsRequest{
 		Path:            r.URL.Path,
 		HttpRequestText: b.String(),
 	})
