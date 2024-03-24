@@ -16,12 +16,14 @@ services:
       - .env
   contents:
     image: motxx/aperture-lnproxy-contents
+    platform: linux/amd64
     build: ./contents
     restart: always
     env_file:
       - ./contents/.env
   lnproxy:
     image: motxx/aperture-lnproxy-lnproxy
+    platform: linux/amd64
     build: ./lnproxy
     restart: always
     volumes:
@@ -30,6 +32,7 @@ services:
       - ./lnproxy/.env
   aperture:
     image: motxx/aperture-lnproxy-aperture
+    platform: linux/amd64
     build: ./aperture
     restart: always
     environment:
