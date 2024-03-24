@@ -6,9 +6,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/lightninglabs/aperture/aperturedb/sqlc"
 	"github.com/lightningnetwork/lnd/clock"
 	"github.com/lightningnetwork/lnd/tor"
+	"github.com/motxx/aperture-lnproxy/aperture/aperturedb/sqlc"
 )
 
 type (

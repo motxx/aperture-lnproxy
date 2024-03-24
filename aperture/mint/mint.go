@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lightninglabs/aperture/lsat"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
 	"gopkg.in/macaroon.v2"
 )
 

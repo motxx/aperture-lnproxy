@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pricesrpc;
 
-option go_package = "github.com/lightninglabs/aperture/pricesrpc";
+option go_package = "github.com/motxx/aperture-lnproxy/aperture/pricesrpc";
 
 service Prices {
   rpc GetPaymentDetails(GetPaymentDetailsRequest)

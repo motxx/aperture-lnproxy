@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/lightninglabs/aperture/lsat"
-	"github.com/lightninglabs/aperture/mint"
-	"github.com/lightninglabs/aperture/proxy"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
+	"github.com/motxx/aperture-lnproxy/aperture/proxy"
 )
 
 // staticServiceLimiter provides static restrictions for services.

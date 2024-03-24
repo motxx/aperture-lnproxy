@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/lightninglabs/aperture/pricesrpc"
+	"github.com/motxx/aperture-lnproxy/aperture/pricesrpc"
 )
 
 var _ pricesrpc.PricesServer = (*Server)(nil)

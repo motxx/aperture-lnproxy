@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lightninglabs/aperture/internal/test"
 	"github.com/lightninglabs/lndclient"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/internal/test"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"

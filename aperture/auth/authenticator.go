@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/lightninglabs/aperture/lsat"
-	"github.com/lightninglabs/aperture/mint"
 	"github.com/lightningnetwork/lnd/lnrpc"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 )
 
 // LsatAuthenticator is an authenticator that uses the LSAT protocol to

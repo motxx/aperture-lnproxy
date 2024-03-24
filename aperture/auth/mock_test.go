@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/lightninglabs/aperture/auth"
-	"github.com/lightninglabs/aperture/lsat"
-	"github.com/lightninglabs/aperture/mint"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/auth"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 	"gopkg.in/macaroon.v2"
 )
 

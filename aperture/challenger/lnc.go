@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lightninglabs/aperture/lnc"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/lnc"
 )
 
 // LNCChallenger is a challenger that uses LNC to connect to an lnd backend to

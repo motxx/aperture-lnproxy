@@ -1,4 +1,4 @@
-PKG := github.com/lightninglabs/aperture
+PKG := github.com/motxx/aperture-lnproxy/aperture
 ESCPKG := github.com\/lightninglabs\/aperture
 TOOLS_DIR := tools
 

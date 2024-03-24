@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ellemouton/aperture-demo/contentrpc"
+	"github.com/motxx/aperture-lnproxy/contents/contentrpc"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

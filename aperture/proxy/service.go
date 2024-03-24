@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcutil"
-	"github.com/lightninglabs/aperture/auth"
-	"github.com/lightninglabs/aperture/freebie"
-	"github.com/lightninglabs/aperture/pricer"
+	"github.com/motxx/aperture-lnproxy/aperture/auth"
+	"github.com/motxx/aperture-lnproxy/aperture/freebie"
+	"github.com/motxx/aperture-lnproxy/aperture/pricer"
 )
 
 var (

@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 
-	"github.com/lightninglabs/aperture/lsat"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
 )
 
 var (

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lightninglabs/aperture/freebie"
+	"github.com/motxx/aperture-lnproxy/aperture/freebie"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	content "github.com/ellemouton/aperture-demo"
 	"github.com/lightningnetwork/lnd/signal"
+	content "github.com/motxx/aperture-lnproxy/contents"
 )
 
 func main() {

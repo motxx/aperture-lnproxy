@@ -3,9 +3,9 @@ package challenger
 import (
 	"context"
 
-	"github.com/lightninglabs/aperture/auth"
-	"github.com/lightninglabs/aperture/mint"
 	"github.com/lightningnetwork/lnd/lnrpc"
+	"github.com/motxx/aperture-lnproxy/aperture/auth"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 	"google.golang.org/grpc"
 )
 

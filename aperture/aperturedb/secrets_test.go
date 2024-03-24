@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lightninglabs/aperture/mint"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 	"github.com/stretchr/testify/require"
 )
 

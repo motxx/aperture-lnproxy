@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcd/btcutil"
-	"github.com/lightninglabs/aperture/aperturedb"
-	"github.com/lightninglabs/aperture/proxy"
+	"github.com/motxx/aperture-lnproxy/aperture/aperturedb"
+	"github.com/motxx/aperture-lnproxy/aperture/proxy"
 )
 
 var (

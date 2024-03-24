@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/lightninglabs/aperture/lnc"
 	"github.com/lightninglabs/lightning-node-connect/mailbox"
+	"github.com/motxx/aperture-lnproxy/aperture/lnc"
 	"github.com/stretchr/testify/require"
 )
 

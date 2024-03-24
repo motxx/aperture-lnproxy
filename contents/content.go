@@ -14,11 +14,11 @@ import (
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/caarlos0/env"
-	pb "github.com/ellemouton/aperture-demo/contentrpc"
-	"github.com/ellemouton/aperture-demo/db"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	pricespb "github.com/lightninglabs/aperture/pricesrpc"
+	pricespb "github.com/motxx/aperture-lnproxy/aperture/pricesrpc"
+	pb "github.com/motxx/aperture-lnproxy/contents/contentrpc"
+	"github.com/motxx/aperture-lnproxy/contents/db"
 	"google.golang.org/grpc"
 )
 

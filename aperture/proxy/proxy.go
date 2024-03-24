@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lightninglabs/aperture/auth"
-	"github.com/lightninglabs/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/auth"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
 	"google.golang.org/grpc/codes"
 )
 

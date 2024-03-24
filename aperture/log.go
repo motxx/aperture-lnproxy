@@ -2,14 +2,14 @@ package aperture
 
 import (
 	"github.com/btcsuite/btclog"
-	"github.com/lightninglabs/aperture/auth"
-	"github.com/lightninglabs/aperture/challenger"
-	"github.com/lightninglabs/aperture/lsat"
-	"github.com/lightninglabs/aperture/proxy"
 	"github.com/lightninglabs/lndclient"
 	"github.com/lightningnetwork/lnd"
 	"github.com/lightningnetwork/lnd/build"
 	"github.com/lightningnetwork/lnd/signal"
+	"github.com/motxx/aperture-lnproxy/aperture/auth"
+	"github.com/motxx/aperture-lnproxy/aperture/challenger"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/proxy"
 )
 
 const Subsystem = "APER"

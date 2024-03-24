@@ -7,10 +7,10 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/lightninglabs/aperture/aperturedb/sqlc"
-	"github.com/lightninglabs/aperture/lsat"
-	"github.com/lightninglabs/aperture/mint"
 	"github.com/lightningnetwork/lnd/clock"
+	"github.com/motxx/aperture-lnproxy/aperture/aperturedb/sqlc"
+	"github.com/motxx/aperture-lnproxy/aperture/lsat"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 )
 
 type (

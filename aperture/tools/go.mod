@@ -1,4 +1,4 @@
-module github.com/lightninglabs/aperture/tools
+module github.com/motxx/aperture-lnproxy/aperture/tools
 
 go 1.21
 

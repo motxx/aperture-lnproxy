@@ -17,10 +17,10 @@ import (
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
-	"github.com/lightninglabs/aperture/lnurl"
 	"github.com/lightningnetwork/lnd/channeldb/migration_01_to_11/zpay32"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/motxx/aperture-lnproxy/aperture/lnurl"
 )
 
 // LnproxyChallenger is a challenger that uses an lnproxy backend to create new LSAT
