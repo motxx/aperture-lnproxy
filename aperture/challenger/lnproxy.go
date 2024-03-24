@@ -268,7 +268,7 @@ type ProxyParameters struct {
 	DescriptionHash *string `json:"description_hash"`
 }
 
-func (l *LnproxyChallenger) getRoutingMsat(amount_sats int64) *uint64 {
+func getRoutingMsat(amount_sats int64) *uint64 {
 	routingMsat := uint64(amount_sats * 3 / 100)
 	if routingMsat < 10_000 {
 		minFeeSat := uint64(10_000)
@@ -298,81 +298,88 @@ func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
 		panic(err)
 	}
 
+	creatorInvoice, err := getCreatorInvoice("moti@getalby.com", price)
+	if err != nil {
+		return "", lntypes.ZeroHash, fmt.Errorf("error getting creator invoice: %v", err)
+	}
+
+	routingMsat := getRoutingMsat(price)
+	log.Infof("Price: %d, RoutingMsat: %d", price, *routingMsat)
+
+	wrappedInvoice, err := requestWrappedInvoice(ProxyParameters{
+		Invoice:     creatorInvoice,
+		RoutingMsat: routingMsat,
+	})
+	if err != nil {
+		return "", lntypes.ZeroHash, fmt.Errorf("error requesting wrapped invoice: %v", err)
+	}
+
+	paymentHash, err := extractPaymentHash(wrappedInvoice)
+	if err != nil {
+		return "", lntypes.ZeroHash, fmt.Errorf("error extracting payment hash: %v", err)
+	}
+	log.Info("Payment hash: ", paymentHash)
+
+	return wrappedInvoice, paymentHash, nil
+}
+
+func getCreatorInvoice(lud16 string, price int64) (string, error) {
+	lu, err := lnurl.NewLnurl(lud16)
+	if err != nil {
+		return "", fmt.Errorf("error creating lnurl: %v", err)
+	}
+
+	invoice, err := lu.GetInvoice(price)
+	if err != nil {
+		return "", fmt.Errorf("error getting creator invoice: %v", err)
+	}
+	return invoice, nil
+}
+
+func requestWrappedInvoice(p ProxyParameters) (string, error) {
+	b, err := json.Marshal(p)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal spec parameter: %v", p)
+	}
+
 	var conf ApertureConfig
 	if err := env.Parse(&conf); err != nil {
 		panic(err)
 	}
 
-	lud16 := "moti@getalby.com"
-	lu, err := lnurl.NewLnurl(lud16)
-	if err != nil {
-		log.Errorf("Error creating lnurl: %v", err)
-		return "", lntypes.ZeroHash, err
-	}
-
-	creatorInvoice, err := lu.GetInvoice(price)
-	if err != nil {
-		log.Errorf("Error getting creatorInvoice: %v", err)
-		return "", lntypes.ZeroHash, err
-	}
-
-	routingMsat := l.getRoutingMsat(price)
-	log.Infof("Price: %d, RoutingMsat: %d", price, *routingMsat)
-
-	p := ProxyParameters{
-		Invoice:     creatorInvoice,
-		RoutingMsat: routingMsat,
-	}
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Errorf("Failed to marshal spec parameter: %v", p)
-		return "", lntypes.ZeroHash, fmt.Errorf("failed to marshal spec parameter: %v", p)
-	}
-
 	u, err := url.Parse(conf.LnproxyUrl)
 	if err != nil {
-		log.Errorf("Failed to parse lnproxy url: %v", err)
-		return "", lntypes.ZeroHash, fmt.Errorf("failed to parse lnproxy url: %v", err)
+		return "", fmt.Errorf("failed to parse lnproxy url: %v", err)
 	}
 	u.Path = path.Join(u.Path, "spec")
 	res, err := http.Post(u.String(), "application/json", bytes.NewReader(b))
 	if err != nil {
-		return "", lntypes.ZeroHash, err
+		return "", err
 	}
 	defer res.Body.Close()
 
 	var rawJSON json.RawMessage
 	err = json.NewDecoder(res.Body).Decode(&rawJSON)
 	if err != nil {
-		log.Errorf("Error unmarshaling response: %v", err)
-		return "", lntypes.ZeroHash, fmt.Errorf("error unmarshaling response: %v", err)
+		return "", fmt.Errorf("error unmarshaling response: %v", err)
 	}
 
 	if bytes.Contains(rawJSON, []byte("ERROR")) {
 		var errResp LnproxySpecErrorResponse
 		err := json.Unmarshal(rawJSON, &errResp)
 		if err != nil {
-			return "", lntypes.ZeroHash, fmt.Errorf("error decoding error response: %v", err)
+			log.Info("TODO: Only Alby response is supported. If you think the response is valid, support the response here.")
+			return "", fmt.Errorf("error decoding error response: %v", err)
 		}
-		return "", lntypes.ZeroHash, fmt.Errorf("error response: %s", errResp.Reason)
+		return "", fmt.Errorf("error response: %s", errResp.Reason)
 	}
 
-	log.Info("Success response: ", string(rawJSON))
 	var resp LnproxySpecSuccessResponse
 	err = json.Unmarshal([]byte(rawJSON), &resp)
 	if err != nil {
-		return "", lntypes.ZeroHash, fmt.Errorf("error decoding success response: %v", err)
+		return "", fmt.Errorf("error decoding success response: %v", err)
 	}
-	log.Info("Wrapped invoice: ", resp.WrappedInvoice)
-
-	paymentHash, err := extractPaymentHash(resp.WrappedInvoice)
-	if err != nil {
-		log.Errorf("Error extracting payment hash: %v", err)
-		return "", lntypes.ZeroHash, fmt.Errorf("error extracting payment hash: %v", err)
-	}
-	log.Info("Payment hash: ", paymentHash)
-
-	return resp.WrappedInvoice, paymentHash, nil
+	return resp.WrappedInvoice, nil
 }
 
 func extractPaymentHash(invoice string) (lntypes.Hash, error) {
