@@ -25,10 +25,10 @@ import (
 type Server struct {
 	DB *db.DB
 
-	*pb.UnimplementedContentServer
+	*pb.UnimplementedContentServiceServer
 	*pricespb.UnimplementedPricesServer
 
-	contentServer *grpc.Server
+	contentServiceServer *grpc.Server
 
 	// TODO: refactor
 	cfg    aws.Config
@@ -98,8 +98,8 @@ func (s *Server) SetupAWSConfig(ctx context.Context) error {
 
 func (s *Server) Start() error {
 	// Start the Content gRPC server.
-	s.contentServer = grpc.NewServer()
-	pb.RegisterContentServer(s.contentServer, s)
+	s.contentServiceServer = grpc.NewServer()
+	pb.RegisterContentServiceServer(s.contentServiceServer, s)
 
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -108,8 +108,8 @@ func (s *Server) Start() error {
 
 	log.Printf("Content Server serving at %s", ":8080")
 	go func() {
-		if err := s.contentServer.Serve(lis); err != nil {
-			fmt.Printf("error starting content server: %v\n", err)
+		if err := s.contentServiceServer.Serve(lis); err != nil {
+			fmt.Printf("error starting content service server: %v\n", err)
 		}
 	}()
 
@@ -145,12 +145,79 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) Stop() error {
-	s.contentServer.Stop()
+	s.contentServiceServer.Stop()
 
 	return s.DB.Close()
 }
 
-var _ pb.ContentServer = (*Server)(nil)
+var _ pb.ContentServiceServer = (*Server)(nil)
+
+func (s *Server) AddContent(ctx context.Context, req *pb.AddContentRequest) (*pb.AddContentResponse, error) {
+	content := req.GetContent()
+	id, err := s.DB.AddContent(&db.Content{
+		Id:             content.Id,
+		Title:          content.Title,
+		Author:         content.Author,
+		Filepath:       content.Filepath,
+		RecipientLud16: content.RecipientLud16,
+		Price:          content.Price,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.AddContentResponse{
+		Id: id,
+	}, nil
+}
+
+func (s *Server) UpdateContent(ctx context.Context, req *pb.UpdateContentRequest) (*pb.UpdateContentResponse, error) {
+	content := req.GetContent()
+	id, err := s.DB.UpdateContent(&db.Content{
+		Id:             content.Id,
+		Title:          content.Title,
+		Author:         content.Author,
+		Filepath:       content.Filepath,
+		RecipientLud16: content.RecipientLud16,
+		Price:          content.Price,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UpdateContentResponse{
+		Id: id,
+	}, nil
+}
+
+func (s *Server) RemoveContent(ctx context.Context, req *pb.RemoveContentRequest) (*pb.RemoveContentResponse, error) {
+	id, err := s.DB.RemoveContent(req.GetId())
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.RemoveContentResponse{
+		Id: id,
+	}, nil
+}
+
+func (s *Server) GetContent(ctx context.Context, req *pb.GetContentRequest) (*pb.GetContentResponse, error) {
+	content, err := s.DB.GetContent(req.GetId())
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetContentResponse{
+		Content: &pb.Content{
+			Id:             content.Id,
+			Title:          content.Title,
+			Author:         content.Author,
+			Filepath:       content.Filepath,
+			RecipientLud16: content.RecipientLud16,
+			Price:          content.Price,
+		},
+	}, nil
+}
 
 func freebeeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Freebee endpoint test")

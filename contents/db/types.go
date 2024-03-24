@@ -13,6 +13,7 @@ type Quote struct {
 }
 
 type Content struct {
+	Id             string `json:"id"`
 	Title          string `json:"title"`
 	Author         string `json:"author"`
 	Filepath       string `json:"filepath"`

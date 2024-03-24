@@ -25,10 +25,13 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:   "addarticle",
-			Usage:  "add a article to the content delivery system",
-			Action: addArticle,
+			Name:   "addcontent",
+			Usage:  "add a content",
+			Action: addContent,
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "id",
+				},
 				cli.StringFlag{
 					Name: "title",
 				},
@@ -36,23 +39,58 @@ func main() {
 					Name: "author",
 				},
 				cli.StringFlag{
-					Name: "content",
+					Name: "filepath",
+				},
+				cli.StringFlag{
+					Name: "recipient_lud16",
+				},
+				cli.Int64Flag{
+					Name: "price",
 				},
 			},
 		},
 		{
-			Name:   "addquote",
-			Usage:  "add a quote to the content delivery system",
-			Action: addQuote,
+			Name:   "updatecontent",
+			Usage:  "update the content",
+			Action: updateContent,
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "id",
+				},
+				cli.StringFlag{
+					Name: "title",
+				},
 				cli.StringFlag{
 					Name: "author",
 				},
 				cli.StringFlag{
-					Name: "content",
+					Name: "filepath",
+				},
+				cli.StringFlag{
+					Name: "recipient_lud16",
 				},
 				cli.Int64Flag{
 					Name: "price",
+				},
+			},
+		},
+		{
+			Name:   "removecontent",
+			Usage:  "remove the content",
+			Action: removeContent,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "id",
+				},
+			},
+		},
+		{
+			Name:   "getcontent",
+			Usage:  "get the content",
+			Action: getContent,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "id",
 				},
 			},
 		},
@@ -64,7 +102,7 @@ func main() {
 	}
 }
 
-func getClient(ctx *cli.Context) (contentrpc.ContentClient, func(), error) {
+func getClient(ctx *cli.Context) (contentrpc.ContentServiceClient, func(), error) {
 	rpcServer := ctx.GlobalString("rpcserver")
 
 	conn, err := grpc.Dial(rpcServer, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -74,62 +112,40 @@ func getClient(ctx *cli.Context) (contentrpc.ContentClient, func(), error) {
 
 	cleanup := func() { _ = conn.Close() }
 
-	sessionsClient := contentrpc.NewContentClient(conn)
+	sessionsClient := contentrpc.NewContentServiceClient(conn)
 	return sessionsClient, cleanup, nil
 }
 
-func addArticle(ctx *cli.Context) error {
+func addContent(ctx *cli.Context) error {
 	client, cleanup, err := getClient(ctx)
 	if err != nil {
 		return err
 	}
 	defer cleanup()
+
+	id := ctx.String("id")
+	if id == "" {
+		return fmt.Errorf("must set an id for the content")
+	}
 
 	title := ctx.String("title")
 	if title == "" {
-		return fmt.Errorf("must set a title for the article")
+		return fmt.Errorf("must set a title for the content")
 	}
 
 	author := ctx.String("author")
 	if author == "" {
-		return fmt.Errorf("must set a author for the article")
+		return fmt.Errorf("must set a author for the content")
 	}
 
-	content := ctx.String("content")
-	if content == "" {
-		return fmt.Errorf("must set content for the article")
+	filepath := ctx.String("filepath")
+	if filepath == "" {
+		return fmt.Errorf("must set filepath for the content")
 	}
 
-	resp, err := client.AddArticle(context.Background(),
-		&contentrpc.AddArticleRequest{
-			Title:   title,
-			Author:  author,
-			Content: content,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Success! New article id is: %d\n", resp.Id)
-	return nil
-}
-
-func addQuote(ctx *cli.Context) error {
-	client, cleanup, err := getClient(ctx)
-	if err != nil {
-		return err
-	}
-	defer cleanup()
-
-	author := ctx.String("author")
-	if author == "" {
-		return fmt.Errorf("must set a author for the quote")
-	}
-
-	content := ctx.String("content")
-	if content == "" {
-		return fmt.Errorf("must set content for the quote")
+	recipientLud16 := ctx.String("recipient_lud16")
+	if recipientLud16 == "" {
+		return fmt.Errorf("must set recipient_lud16 for the content")
 	}
 
 	price := ctx.Int64("price")
@@ -137,17 +153,147 @@ func addQuote(ctx *cli.Context) error {
 		return fmt.Errorf("cant have a negative price")
 	}
 
-	resp, err := client.AddQuote(context.Background(),
-		&contentrpc.AddQuoteRequest{
-			Author:  author,
-			Content: content,
-			Price:   price,
+	resp, err := client.AddContent(context.Background(),
+		&contentrpc.AddContentRequest{
+			Content: &contentrpc.Content{
+				Id:             id,
+				Title:          title,
+				Author:         author,
+				Filepath:       filepath,
+				RecipientLud16: recipientLud16,
+				Price:          price,
+			},
 		},
 	)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Success! New quote id is: %d\n", resp.Id)
+	fmt.Printf("Success to add content. Content id: %s\n", resp.Id)
 	return nil
+}
+
+func updateContent(ctx *cli.Context) error {
+	client, cleanup, err := getClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	id := ctx.String("id")
+	if id == "" {
+		return fmt.Errorf("must set an id for the content")
+	}
+
+	proto, err := getContentImpl(ctx, id)
+	if err != nil {
+		return fmt.Errorf("no content with id %s", id)
+	}
+
+	var moreThanOneSet bool
+
+	title := ctx.String("title")
+	if title != "" {
+		proto.Title = title
+		moreThanOneSet = true
+	}
+
+	author := ctx.String("author")
+	if author != "" {
+		proto.Author = author
+		moreThanOneSet = true
+	}
+
+	filepath := ctx.String("filepath")
+	if filepath != "" {
+		proto.Filepath = filepath
+		moreThanOneSet = true
+	}
+
+	recipientLud16 := ctx.String("recipient_lud16")
+	if recipientLud16 != "" {
+		proto.RecipientLud16 = recipientLud16
+		moreThanOneSet = true
+	}
+
+	price := ctx.Int64("price")
+	if price > 0 {
+		proto.Price = price
+		moreThanOneSet = true
+	}
+
+	if !moreThanOneSet {
+		return fmt.Errorf("must set at least one field to update")
+	}
+
+	resp, err := client.UpdateContent(context.Background(),
+		&contentrpc.UpdateContentRequest{
+			Content: proto,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Success to update content. Content id: %s\n", resp.Id)
+	return nil
+}
+
+func removeContent(ctx *cli.Context) error {
+	client, cleanup, err := getClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	id := ctx.String("id")
+	if id == "" {
+		return fmt.Errorf("must set an id for the content")
+	}
+
+	resp, err := client.RemoveContent(context.Background(),
+		&contentrpc.RemoveContentRequest{
+			Id: id,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Success to remove content. Content id: %s\n", resp.Id)
+	return nil
+}
+
+func getContent(ctx *cli.Context) error {
+	id := ctx.String("id")
+	if id == "" {
+		return fmt.Errorf("must set an id for the content")
+	}
+
+	proto, err := getContentImpl(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Content: %+v\n", proto)
+	return nil
+}
+
+func getContentImpl(ctx *cli.Context, id string) (*contentrpc.Content, error) {
+	client, cleanup, err := getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup()
+
+	resp, err := client.GetContent(context.Background(),
+		&contentrpc.GetContentRequest{
+			Id: id,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Content, nil
 }

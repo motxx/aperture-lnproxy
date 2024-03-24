@@ -1,9 +1,10 @@
 {
   "contents": {
     "moti.png": {
+      "id": "moti.png",
       "title": "moti avatar",
       "author": "moti",
-      "filepath": "moti.png",
+      "filepath": "path/to/moti.png",
       "recipient_lud16": "moti@getalby.com",
       "price": 1
     }

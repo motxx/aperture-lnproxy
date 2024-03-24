@@ -1,11 +1,10 @@
-# Aperture Dynamic Price Demo
-
-### Video Tutorial:
-
-https://www.youtube.com/watch?v=Y2ZG-qcw7Sw
+# Content Discovery Service
 
 ### Install the app:
-`make install`
+
+```
+make install
+```
 
 ### Diagrams:
 *Basic App*
@@ -20,19 +19,22 @@ https://www.youtube.com/watch?v=Y2ZG-qcw7Sw
 
 ### CLI commands:
 
-Add an article:
+```
+docker exec -it <container_name> \
+  appcli addcontent --id="avatar.png" --title="My Avatar" --author="moti" --filepath="under/the/s3/path/image.png" --recipient_lud16="moti@getalby.com" --price=30
+```
 
-`appcli addarticle --title="The Blocksize War" --author="Jonathan Bier" --content="All the Bitcoin gossip"`
+```
+docker exec -it <container_name> \
+  appcli updatecontent --id="avatar.png" --title="My Avatar" --author="moti" --filepath="under/the/s3/path/image.png" --recipient_lud16="moti@getalby.com" --price=30
+```
 
+```
+docker exec -it <container_name> \
+  appcli removecontent --id="avatar.png"
+```
 
-Add a quote:
-
-`appcli addquote --author="Shakespeare" --content="To be or not to be? That is the question"`
-
-
-### TODO:
-
-- dockerize the proto generation process. Need go plugins and then run the
-  following:    
-        `protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative contentrpc/content.proto``
-
+```
+docker exec -it <container_name> \
+  appcli getcontent --id="avatar.png"
+```

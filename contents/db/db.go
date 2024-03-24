@@ -25,8 +25,7 @@ func NewDB() (*DB, error) {
 	// existing one.
 	file, err := os.Open(dbName)
 	if errors.Is(err, os.ErrNotExist) {
-		// Create the file
-		file, err = os.Create(dbName)
+		_, err = os.Create(dbName)
 		if err != nil {
 			return nil, err
 		}
@@ -70,40 +69,40 @@ func (d *DB) writeContent() error {
 	return ioutil.WriteFile(dbName, b, 0644)
 }
 
-func (d *DB) AddArticle(article *Article) (int, error) {
-	d.content.Articles = append(d.content.Articles, article)
+func (d *DB) AddContent(content *Content) (string, error) {
+	if c, found := d.content.Contents[content.Id]; found {
+		return "", fmt.Errorf("content with id %s already exists", c.Id)
+	}
 
+	d.content.Contents[content.Id] = content
 	if err := d.writeContent(); err != nil {
-		return 0, err
+		return "", err
 	}
-
-	return len(d.content.Articles), nil
+	return content.Id, nil
 }
 
-func (d *DB) GetArticle(id int) (*Article, error) {
-	if len(d.content.Articles) < id || id <= 0 {
-		return nil, fmt.Errorf("no article with id %d", id)
+func (d *DB) UpdateContent(content *Content) (string, error) {
+	if _, found := d.content.Contents[content.Id]; !found {
+		return "", fmt.Errorf("no content with id %s", content.Id)
 	}
 
-	return d.content.Articles[id-1], nil
-}
-
-func (d *DB) AddQuote(quote *Quote) (int, error) {
-	d.content.Quotes = append(d.content.Quotes, quote)
-
+	d.content.Contents[content.Id] = content
 	if err := d.writeContent(); err != nil {
-		return 0, err
+		return "", err
 	}
-
-	return len(d.content.Quotes), nil
+	return content.Id, nil
 }
 
-func (d *DB) GetQuote(id int) (*Quote, error) {
-	if len(d.content.Quotes) < id || id <= 0 {
-		return nil, fmt.Errorf("no quote with id %d", id)
+func (d *DB) RemoveContent(id string) (string, error) {
+	if _, found := d.content.Contents[id]; !found {
+		return "", fmt.Errorf("no content with id %s", id)
 	}
 
-	return d.content.Quotes[id-1], nil
+	delete(d.content.Contents, id)
+	if err := d.writeContent(); err != nil {
+		return "", err
+	}
+	return id, nil
 }
 
 func (d *DB) GetContent(id string) (*Content, error) {
