@@ -1,3 +1,9 @@
+all: build
+build:
+	go build ./cmd/app
+	go build ./cmd/appcli
+build-cli:
+	go build ./cmd/appcli
 install:
 	go install ./cmd/app
 	go install ./cmd/appcli
