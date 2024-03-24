@@ -21,6 +21,8 @@ services:
     restart: always
     env_file:
       - ./contents/.env
+    ports:
+      - "8080:8080"
   lnproxy:
     image: motxx/aperture-lnproxy-lnproxy
     platform: linux/amd64
@@ -46,8 +48,6 @@ services:
     volumes:
       - ./.lnd:/root/.lnd
       - ./config:/root/config
-    ports:
-      - "8081:8081"
   nginx:
     image: nginx:alpine
     volumes:
