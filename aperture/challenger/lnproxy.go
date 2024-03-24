@@ -291,14 +291,14 @@ type LnproxySpecSuccessResponse struct {
 // The price is given in satoshis.
 //
 // NOTE: This is part of the mint.Challenger interface.
-func (l *LnproxyChallenger) NewChallenge(price int64) (string, lntypes.Hash,
+func (l *LnproxyChallenger) NewChallenge(recipientLud16 string, price int64) (string, lntypes.Hash,
 	error) {
 
 	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
 
-	creatorInvoice, err := getCreatorInvoice("moti@getalby.com", price)
+	creatorInvoice, err := getCreatorInvoice(recipientLud16, price)
 	if err != nil {
 		return "", lntypes.ZeroHash, fmt.Errorf("error getting creator invoice: %v", err)
 	}

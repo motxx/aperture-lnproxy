@@ -34,7 +34,7 @@ func (d *mockChallenger) Stop() {
 	// Nothing to do here.
 }
 
-func (d *mockChallenger) NewChallenge(price int64) (string, lntypes.Hash,
+func (d *mockChallenger) NewChallenge(recipientLud16 string, price int64) (string, lntypes.Hash,
 	error) {
 
 	return testPayReq, testHash, nil

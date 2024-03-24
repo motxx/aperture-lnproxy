@@ -139,7 +139,7 @@ func TestLndChallenger(t *testing.T) {
 	c, invoiceMock, mainErrChan := newChallenger()
 
 	// Creating a new challenge should add an invoice to the lnd backend.
-	req, hash, err := c.NewChallenge(1337)
+	req, hash, err := c.NewChallenge("", 1337)
 	require.NoError(t, err)
 	require.Equal(t, "foo", req)
 	require.Equal(t, lntypes.ZeroHash, hash)

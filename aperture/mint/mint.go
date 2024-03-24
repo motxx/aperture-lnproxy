@@ -28,7 +28,7 @@ type Challenger interface {
 	// payment request. The payment hash is also returned as a convenience
 	// to avoid having to decode the payment request in order to retrieve
 	// its payment hash.
-	NewChallenge(price int64) (string, lntypes.Hash, error)
+	NewChallenge(recipientLud16 string, price int64) (string, lntypes.Hash, error)
 
 	// Stop shuts down the challenger.
 	Stop()
@@ -111,11 +111,11 @@ func (m *Mint) MintLSAT(ctx context.Context,
 
 	// Let the LSAT value as the price of the most expensive of the
 	// services.
-	price := maximumPrice(services)
+	recipientLud16, price := paymentDetailsForMaxPrice(services)
 
 	// We'll start by retrieving a new challenge in the form of a Lightning
 	// payment request to present the requester of the LSAT with.
-	paymentRequest, paymentHash, err := m.cfg.Challenger.NewChallenge(price)
+	paymentRequest, paymentHash, err := m.cfg.Challenger.NewChallenge(recipientLud16, price)
 	if err != nil {
 		return nil, "", err
 	}
@@ -163,18 +163,20 @@ func (m *Mint) MintLSAT(ctx context.Context,
 	return mac, paymentRequest, nil
 }
 
-// maximumPrice determines the necessary price to use for a collection
+// paymentDetailsForMaxPrice determines the necessary payment details to use for a collection
 // of services.
-func maximumPrice(services []lsat.Service) int64 {
-	var max int64
+func paymentDetailsForMaxPrice(services []lsat.Service) (string, int64) {
+	var recipientLud16 string
+	var maxPrice int64
 
 	for _, service := range services {
-		if service.Price > max {
-			max = service.Price
+		if service.Price > maxPrice {
+			recipientLud16 = service.RecipientLud16
+			maxPrice = service.Price
 		}
 	}
 
-	return max
+	return recipientLud16, maxPrice
 }
 
 // createUniqueIdentifier creates a new LSAT identifier bound to a payment hash

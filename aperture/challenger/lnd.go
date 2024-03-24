@@ -251,7 +251,7 @@ func (l *LndChallenger) Stop() {
 // request (invoice) and the corresponding payment hash.
 //
 // NOTE: This is part of the mint.Challenger interface.
-func (l *LndChallenger) NewChallenge(price int64) (string, lntypes.Hash,
+func (l *LndChallenger) NewChallenge(recipientLud16 string, price int64) (string, lntypes.Hash,
 	error) {
 
 	// Obtain a new invoice from lnd first. We need to know the payment hash

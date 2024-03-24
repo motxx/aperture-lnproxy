@@ -65,10 +65,10 @@ func (l *LNCChallenger) Stop() {
 // request (invoice) and the corresponding payment hash.
 //
 // NOTE: This is part of the mint.Challenger interface.
-func (l *LNCChallenger) NewChallenge(price int64) (string, lntypes.Hash,
+func (l *LNCChallenger) NewChallenge(recipientLud16 string, price int64) (string, lntypes.Hash,
 	error) {
 
-	return l.lndChallenger.NewChallenge(price)
+	return l.lndChallenger.NewChallenge(recipientLud16, price)
 }
 
 // VerifyInvoiceStatus checks that an invoice identified by a payment
