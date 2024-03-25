@@ -1,113 +1,75 @@
 package db
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
+	"database/sql"
 	"fmt"
-	"io/ioutil"
-	"os"
+
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-const dbName = "db.json"
-
 type DB struct {
-	content *content
+	*bun.DB
 }
 
-type content struct {
-	Articles []*Article  `json:"articles"`
-	Quotes   []*Quote    `json:"quotes"`
-	Contents ContentsMap `json:"contents"`
+type Content struct {
+	bun.BaseModel  `bun:"table:contents"`
+	Id             string `bun:"id,pk"`
+	Title          string `bun:"title"`
+	Author         string `bun:"author"`
+	Filepath       string `bun:"filepath"`
+	RecipientLud16 string `bun:"recipient_lud16"`
+	Price          int64  `bun:"price"`
 }
 
-func NewDB() (*DB, error) {
-	// If there is no existing DB, create a new one. Otherwise, load the
-	// existing one.
-	file, err := os.Open(dbName)
-	if errors.Is(err, os.ErrNotExist) {
-		_, err = os.Create(dbName)
-		if err != nil {
-			return nil, err
-		}
-
-		return &DB{
-			content: &content{},
-		}, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	byteValue, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	content := &content{}
-
-	err = json.Unmarshal(byteValue, content)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DB{
-		content: content,
-	}, nil
-}
-
-func (d *DB) Close() error {
-	return d.writeContent()
-}
-
-func (d *DB) writeContent() error {
-	b, err := json.MarshalIndent(d.content, " ", " ")
-	if err != nil {
-		return err
-	}
-
-	return ioutil.WriteFile(dbName, b, 0644)
+func NewDB(dataSourceName string) (*DB, error) {
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dataSourceName)))
+	db := bun.NewDB(sqldb, pgdialect.New())
+	return &DB{db}, nil
 }
 
 func (d *DB) AddContent(content *Content) (string, error) {
-	if c, found := d.content.Contents[content.Id]; found {
-		return "", fmt.Errorf("content with id %s already exists", c.Id)
-	}
-
-	d.content.Contents[content.Id] = content
-	if err := d.writeContent(); err != nil {
+	_, err := d.NewInsert().Model(content).Exec(context.Background())
+	if err != nil {
 		return "", err
 	}
 	return content.Id, nil
 }
 
 func (d *DB) UpdateContent(content *Content) (string, error) {
-	if _, found := d.content.Contents[content.Id]; !found {
-		return "", fmt.Errorf("no content with id %s", content.Id)
-	}
-
-	d.content.Contents[content.Id] = content
-	if err := d.writeContent(); err != nil {
+	_, err := d.NewUpdate().Model(content).Where("id = ?", content.Id).Exec(context.Background())
+	if err != nil {
 		return "", err
 	}
 	return content.Id, nil
 }
 
 func (d *DB) RemoveContent(id string) (string, error) {
-	if _, found := d.content.Contents[id]; !found {
-		return "", fmt.Errorf("no content with id %s", id)
+	count, err := d.NewSelect().Model((*Content)(nil)).Where("id = ?", id).Count(context.Background())
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		return "", fmt.Errorf("content with id %s does not exist", id)
 	}
 
-	delete(d.content.Contents, id)
-	if err := d.writeContent(); err != nil {
+	_, err = d.NewDelete().Model((*Content)(nil)).Where("id = ?", id).Exec(context.Background())
+	if err != nil {
 		return "", err
 	}
 	return id, nil
 }
 
 func (d *DB) GetContent(id string) (*Content, error) {
-	if c, ok := d.content.Contents[id]; ok {
-		return c, nil
+	content := new(Content)
+	err := d.NewSelect().Model(content).Where("id = ?", id).Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no content with id %s", id)
+		}
+		return nil, err
 	}
-	return nil, fmt.Errorf("no content with id %s", id)
+	return content, nil
 }

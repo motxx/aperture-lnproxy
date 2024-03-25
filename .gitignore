@@ -1,5 +1,7 @@
-db/
-!contents/db
+db/logs/
+db/postgres/data/
+!db/postgres/init/*.sql
+!contents/db/
 .env
 aperture.yaml
 .lnd/

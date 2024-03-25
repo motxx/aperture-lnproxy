@@ -41,22 +41,35 @@ type Server struct {
 }
 
 type ServerConfig struct {
-	Region   string `env:"AWS_REGION" envDefault:"ap-northeast-1"`
-	S3Bucket string `env:"AWS_S3_BUCKET"`
+	Region           string `env:"AWS_REGION" envDefault:"ap-northeast-1"`
+	S3Bucket         string `env:"AWS_S3_BUCKET"`
+	PostgresUser     string `env:"POSTGRES_USER"`
+	PostgresPassword string `env:"POSTGRES_PASSWORD"`
+	PostgresHost     string `env:"POSTGRES_HOST"`
+	PostgresPort     string `env:"POSTGRES_PORT"`
+	PostgresDB       string `env:"POSTGRES_DB"`
 }
 
 func NewServer(ctx context.Context) (*Server, error) {
-	db, err := db.NewDB()
-	if err != nil {
-		return nil, err
-	}
-
 	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
 	var conf ServerConfig
 	if err := env.Parse(&conf); err != nil {
 		panic(err)
+	}
+
+	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		conf.PostgresUser,
+		conf.PostgresPassword,
+		conf.PostgresHost,
+		conf.PostgresPort,
+		conf.PostgresDB,
+		"disable",
+	)
+	db, err := db.NewDB(dataSourceName)
+	if err != nil {
+		return nil, err
 	}
 
 	s := &Server{

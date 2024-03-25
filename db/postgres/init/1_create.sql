@@ -1,0 +1,15 @@
+CREATE DATABASE aperture;
+
+CREATE DATABASE contents_svc;
+
+\c contents_svc;
+
+CREATE TABLE contents (
+  id VARCHAR(255) PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  author VARCHAR(63) NOT NULL,
+  filepath VARCHAR(255) NOT NULL,
+  recipient_lud16 VARCHAR(31) NOT NULL,
+  price INTEGER NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
