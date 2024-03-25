@@ -35,9 +35,9 @@ Add `.lnd/` directory to project root:
 └── tls.cert
 ```
 
-If you use Voltage Cloud, you can download `invoice.macaroon` by the following steps:
+If you use Voltage Cloud, you can download `admin|invoice.macaroon` by the following steps:
 * Voltage Cloud > Manage Access > Macaroon Bakery
-* Download `Type Invoice Default Invoice Macaroon`
+* Download `Type Admin|Invoice Default Invoice Macaroon`
 
 ### config/ directory
 
@@ -69,7 +69,7 @@ nginx
 ## Run docker compose
 
 ```
-docker compose up -d
+make daemon
 ```
 
 ## Use CLI for remote content server
@@ -77,7 +77,6 @@ docker compose up -d
 ### Build CLI
 
 ```
-cd contents
 make build-cli
 ```
 
