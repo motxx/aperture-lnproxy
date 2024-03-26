@@ -103,7 +103,7 @@ func TestLsatAuthenticator(t *testing.T) {
 				id: "valid auth header",
 				header: &http.Header{
 					lsat.HeaderAuthorization: []string{
-						"LSAT " + testMacBase64 + ":" +
+						"L402 " + testMacBase64 + ":" +
 							testPreimage,
 					},
 				},

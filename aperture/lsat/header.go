@@ -14,27 +14,27 @@ import (
 
 const (
 	// HeaderAuthorization is the HTTP header field name that is used to
-	// send the LSAT by REST clients.
+	// send the L402 by REST clients.
 	HeaderAuthorization = "Authorization"
 
 	// HeaderMacaroonMD is the HTTP header field name that is used to send
-	// the LSAT by certain REST and gRPC clients.
+	// the L402 by certain REST and gRPC clients.
 	HeaderMacaroonMD = "Grpc-Metadata-Macaroon"
 
 	// HeaderMacaroon is the HTTP header field name that is used to send the
-	// LSAT by our own gRPC clients.
+	// L402 by our own gRPC clients.
 	HeaderMacaroon = "Macaroon"
 )
 
 var (
-	authRegex  = regexp.MustCompile("LSAT (.*?):([a-f0-9]{64})")
-	authFormat = "LSAT %s:%s"
+	authRegex  = regexp.MustCompile("L402 (.*?):([a-f0-9]{64})")
+	authFormat = "L402 %s:%s"
 )
 
 // FromHeader tries to extract authentication information from HTTP headers.
 // There are two supported formats that can be sent in three different header
 // fields:
-//  1. Authorization: LSAT <macBase64>:<preimageHex>
+//  1. Authorization: L402 <macBase64>:<preimageHex>
 //  2. Grpc-Metadata-Macaroon: <macHex>
 //  3. Macaroon: <macHex>
 //
@@ -126,7 +126,7 @@ func FromHeader(header *http.Header) (*macaroon.Macaroon, lntypes.Preimage, erro
 }
 
 // SetHeader sets the provided authentication elements as the default/standard
-// HTTP header for the LSAT protocol.
+// HTTP header for the L402 protocol.
 func SetHeader(header *http.Header, mac *macaroon.Macaroon,
 	preimage fmt.Stringer) error {
 

@@ -46,7 +46,7 @@ import (
 
 const (
 	// topLevelKey is the top level key for an etcd cluster where we'll
-	// store all LSAT proxy related data.
+	// store all L402 proxy related data.
 	topLevelKey = "lsat/proxy"
 
 	// etcdKeyDelimeter is the delimeter we'll use for all etcd keys to
@@ -273,7 +273,7 @@ func (a *Aperture) Start(errChan chan error) error {
 		authCfg := a.cfg.Authenticator
 		genInvoiceReq := func(price int64) (*lnrpc.Invoice, error) {
 			return &lnrpc.Invoice{
-				Memo:  "LSAT",
+				Memo:  "L402",
 				Value: price,
 			}, nil
 		}

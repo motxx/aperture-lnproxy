@@ -36,7 +36,7 @@ func (a MockAuthenticator) FreshChallengeHeader(r *http.Request,
 
 	header := r.Header
 	header.Set(
-		"WWW-Authenticate", "LSAT macaroon=\"AGIAJEemVQUTEyNCR0exk7ek9"+
+		"WWW-Authenticate", "L402 macaroon=\"AGIAJEemVQUTEyNCR0exk7ek9"+
 			"0Cg==\", invoice=\"lnbc1500n1pw5kjhmpp5fu6xhthlt2vucm"+
 			"zkx6c7wtlh2r625r30cyjsfqhu8rsx4xpz5lwqdpa2fjkzep6yptk"+
 			"sct5yp5hxgrrv96hx6twvusycn3qv9jx7ur5d9hkugr5dusx6cqzp"+

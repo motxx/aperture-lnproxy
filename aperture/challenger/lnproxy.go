@@ -23,7 +23,7 @@ import (
 	"github.com/motxx/aperture-lnproxy/aperture/lnurl"
 )
 
-// LnproxyChallenger is a challenger that uses an lnproxy backend to create new LSAT
+// LnproxyChallenger is a challenger that uses an lnproxy backend to create new L402
 // payment challenges.
 type LnproxyChallenger struct {
 	client        InvoiceClient
@@ -286,7 +286,7 @@ type LnproxySpecSuccessResponse struct {
 	WrappedInvoice string `json:"proxy_invoice"`
 }
 
-// NewChallenge creates a new LSAT payment challenge, returning a payment
+// NewChallenge creates a new L402 payment challenge, returning a payment
 // request (invoice) and the corresponding payment hash.
 // The price is given in satoshis.
 //

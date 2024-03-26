@@ -219,7 +219,7 @@ var (
 		},
 		expectLndCall: false,
 		expectToken:   false,
-		expectInterceptErr: "cannot pay for LSAT automatically, cost " +
+		expectInterceptErr: "cannot pay for L402 automatically, cost " +
 			"of 500000 msat exceeds configured max cost of " +
 			"100000 msat",
 		expectBackendCalls:  1,
@@ -262,7 +262,7 @@ func invoker(opts []grpc.CallOption) error {
 	return backendErr
 }
 
-// TestUnaryInterceptor tests that the interceptor can handle LSAT protocol
+// TestUnaryInterceptor tests that the interceptor can handle L402 protocol
 // responses for unary calls and pay the token.
 func TestUnaryInterceptor(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -290,7 +290,7 @@ func TestUnaryInterceptor(t *testing.T) {
 	}
 }
 
-// TestStreamInterceptor tests that the interceptor can handle LSAT protocol
+// TestStreamInterceptor tests that the interceptor can handle L402 protocol
 // responses in streams and pay the token.
 func TestStreamInterceptor(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -418,7 +418,7 @@ func makeToken(preimage *lntypes.Preimage) *Token {
 func makeMac() *macaroon.Macaroon {
 	dummyMac, err := macaroon.New(
 		[]byte("aabbccddeeff00112233445566778899"), []byte("AA=="),
-		"LSAT", macaroon.LatestVersion,
+		"L402", macaroon.LatestVersion,
 	)
 	if err != nil {
 		panic(fmt.Errorf("unable to create macaroon: %v", err))
@@ -441,6 +441,6 @@ func makeAuthHeader(macBytes []byte) string {
 		"kvj5e77nmwqvpnq9qy9qsq72afzu7sfuppzqg3q2pn49hlh66rv7w60h2rua" +
 		"hx857g94s066yzxcjn4yccqc79779sd232v9ewluvu0tmusvht6r99rld8xs" +
 		"k287cpyac79r"
-	return fmt.Sprintf("LSAT macaroon=\"%s\", invoice=\"%s\"",
+	return fmt.Sprintf("L402 macaroon=\"%s\", invoice=\"%s\"",
 		base64.StdEncoding.EncodeToString(macBytes), invoice)
 }

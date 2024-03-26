@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	// secretsPrefix is the key we'll use to prefix all LSAT identifiers
+	// secretsPrefix is the key we'll use to prefix all L402 identifiers
 	// with when storing secrets in an etcd cluster.
 	secretsPrefix = "secrets"
 )
 
-// idKey returns the full key to store in the database for an LSAT identifier.
+// idKey returns the full key to store in the database for an L402 identifier.
 // The identifier is hex-encoded in order to prevent conflicts with the etcd key
 // delimeter.
 //
@@ -32,7 +32,7 @@ func idKey(id [sha256.Size]byte) string {
 	)
 }
 
-// secretStore is a store of LSAT secrets backed by an etcd cluster.
+// secretStore is a store of L402 secrets backed by an etcd cluster.
 type secretStore struct {
 	*clientv3.Client
 }
@@ -40,7 +40,7 @@ type secretStore struct {
 // A compile-time constraint to ensure secretStore implements mint.SecretStore.
 var _ mint.SecretStore = (*secretStore)(nil)
 
-// newSecretStore instantiates a new LSAT secrets store backed by an etcd
+// newSecretStore instantiates a new L402 secrets store backed by an etcd
 // cluster.
 func newSecretStore(client *clientv3.Client) *secretStore {
 	return &secretStore{Client: client}

@@ -11,7 +11,7 @@ import (
 	"github.com/motxx/aperture-lnproxy/aperture/mint"
 )
 
-// LsatAuthenticator is an authenticator that uses the LSAT protocol to
+// LsatAuthenticator is an authenticator that uses the L402 protocol to
 // authenticate requests.
 type LsatAuthenticator struct {
 	minter  Minter
@@ -23,7 +23,7 @@ type LsatAuthenticator struct {
 var _ Authenticator = (*LsatAuthenticator)(nil)
 
 // NewLsatAuthenticator creates a new authenticator that authenticates requests
-// based on LSAT tokens.
+// based on L402 tokens.
 func NewLsatAuthenticator(minter Minter,
 	checker InvoiceChecker) *LsatAuthenticator {
 
@@ -52,9 +52,9 @@ func (l *LsatAuthenticator) Accept(header *http.Header, serviceName string) bool
 		Preimage:      preimage,
 		TargetService: serviceName,
 	}
-	err = l.minter.VerifyLSAT(context.Background(), verificationParams)
+	err = l.minter.VerifyL402(context.Background(), verificationParams)
 	if err != nil {
-		log.Debugf("Deny: LSAT validation failed: %v", err)
+		log.Debugf("Deny: L402 validation failed: %v", err)
 		return false
 	}
 
@@ -84,19 +84,19 @@ func (l *LsatAuthenticator) FreshChallengeHeader(r *http.Request,
 		RecipientLud16: serviceRecipientLud16,
 		Price:          servicePrice,
 	}
-	mac, paymentRequest, err := l.minter.MintLSAT(
+	mac, paymentRequest, err := l.minter.MintL402(
 		context.Background(), service,
 	)
 	if err != nil {
-		log.Errorf("Error minting LSAT: %v", err)
+		log.Errorf("Error minting L402: %v", err)
 		return nil, err
 	}
 	macBytes, err := mac.MarshalBinary()
 	if err != nil {
-		log.Errorf("Error serializing LSAT: %v", err)
+		log.Errorf("Error serializing L402: %v", err)
 	}
 
-	str := fmt.Sprintf("LSAT macaroon=\"%s\", invoice=\"%s\"",
+	str := fmt.Sprintf("L402 macaroon=\"%s\", invoice=\"%s\"",
 		base64.StdEncoding.EncodeToString(macBytes), paymentRequest)
 	header := r.Header
 	header.Set("WWW-Authenticate", str)

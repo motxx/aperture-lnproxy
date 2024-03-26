@@ -27,7 +27,7 @@ var (
 		"new token. " + manualRetryHint)
 )
 
-// Store is an interface that allows users to store and retrieve an LSAT token.
+// Store is an interface that allows users to store and retrieve an L402 token.
 type Store interface {
 	// CurrentToken returns the token that is currently contained in the
 	// store or an error if there is none.
