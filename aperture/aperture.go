@@ -225,21 +225,6 @@ func (a *Aperture) Start(errChan chan error) error {
 
 	// Connect to the chosen database backend.
 	switch a.cfg.DatabaseBackend {
-	case "etcd":
-		// Initialize our etcd client.
-		a.etcdClient, err = clientv3.New(clientv3.Config{
-			Endpoints:   []string{a.cfg.Etcd.Host},
-			DialTimeout: 5 * time.Second,
-			Username:    a.cfg.Etcd.User,
-			Password:    a.cfg.Etcd.Password,
-		})
-		if err != nil {
-			return fmt.Errorf("unable to connect to etcd: %v", err)
-		}
-
-		secretStore = newSecretStore(a.etcdClient)
-		onionStore = newOnionStore(a.etcdClient)
-
 	case "postgres":
 		db, err := aperturedb.NewPostgresStore(a.cfg.Postgres)
 		if err != nil {
