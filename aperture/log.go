@@ -6,6 +6,7 @@ import (
 	"github.com/lightningnetwork/lnd"
 	"github.com/lightningnetwork/lnd/build"
 	"github.com/lightningnetwork/lnd/signal"
+	"github.com/motxx/aperture-lnproxy/aperture/aperturedb"
 	"github.com/motxx/aperture-lnproxy/aperture/auth"
 	"github.com/motxx/aperture-lnproxy/aperture/challenger"
 	"github.com/motxx/aperture-lnproxy/aperture/lsat"
@@ -31,6 +32,7 @@ func SetupLoggers(root *build.RotatingLogWriter, intercept signal.Interceptor) {
 	lnd.AddSubLogger(root, lsat.Subsystem, intercept, lsat.UseLogger)
 	lnd.AddSubLogger(root, proxy.Subsystem, intercept, proxy.UseLogger)
 	lnd.AddSubLogger(root, challenger.Subsystem, intercept, challenger.UseLogger)
+	lnd.AddSubLogger(root, aperturedb.Subsystem, intercept, aperturedb.UseLogger)
 	lnd.AddSubLogger(root, "LNDC", intercept, lndclient.UseLogger)
 }
 

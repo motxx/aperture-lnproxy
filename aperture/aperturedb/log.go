@@ -2,6 +2,7 @@ package aperturedb
 
 import (
 	"github.com/btcsuite/btclog"
+	"github.com/lightningnetwork/lnd/build"
 )
 
 // Subsystem defines the logging code for this subsystem.
@@ -10,12 +11,11 @@ const Subsystem = "APDB"
 // log is a logger that is initialized with no output filters.  This
 // means the package will not perform any logging by default until the caller
 // requests it.
-var log = btclog.Disabled
+var log btclog.Logger
 
-// DisableLog disables all library log output.  Logging output is disabled
-// by default until UseLogger is called.
-func DisableLog() {
-	UseLogger(btclog.Disabled)
+// The default amount of logging is none.
+func init() {
+	UseLogger(build.NewSubLogger(Subsystem, nil))
 }
 
 // UseLogger uses a specified Logger to output package logging info.
