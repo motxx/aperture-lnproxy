@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/motxx/aperture-lnproxy/aperture/lsat"
@@ -21,6 +22,8 @@ type LsatAuthenticator struct {
 // A compile time flag to ensure the LsatAuthenticator satisfies the
 // Authenticator interface.
 var _ Authenticator = (*LsatAuthenticator)(nil)
+
+const L402RightExpiryDuration = time.Hour
 
 // NewLsatAuthenticator creates a new authenticator that authenticates requests
 // based on L402 tokens.
@@ -54,7 +57,7 @@ func (l *LsatAuthenticator) Accept(header *http.Header, serviceName string) bool
 	}
 	err = l.minter.VerifyL402(context.Background(), verificationParams)
 	if err != nil {
-		log.Debugf("Deny: L402 validation failed: %v", err)
+		log.Debugf("Deny: L402 settlement validation failed: %v", err)
 		return false
 	}
 
@@ -65,6 +68,15 @@ func (l *LsatAuthenticator) Accept(header *http.Header, serviceName string) bool
 	)
 	if err != nil {
 		log.Debugf("Deny: Invoice status mismatch: %v", err)
+		return false
+	}
+
+	// Make sure the rights are still valid.
+	err = l.checker.VerifyRightsWithinExpiry(
+		preimage.Hash(), L402RightExpiryDuration,
+	)
+	if err != nil {
+		log.Debugf("Deny: L402 right validation failed: %v", err)
 		return false
 	}
 

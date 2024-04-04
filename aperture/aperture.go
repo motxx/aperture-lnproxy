@@ -280,7 +280,7 @@ func (a *Aperture) Start(errChan chan error) error {
 			}
 
 			a.challenger, err = challenger.NewLnproxyChallenger(
-				client, genInvoiceReq, context.Background,
+				client, genInvoiceReq, secretStore, context.Background,
 				errChan,
 			)
 			if err != nil {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -34,12 +35,14 @@ type Challenger interface {
 	Stop()
 }
 
+type NullTime = sql.NullTime
+
 // SecretStore is the store responsible for storing L402 secrets. These secrets
 // are required for proper verification of each minted L402.
 type SecretStore interface {
 	// NewSecret creates a new cryptographically random secret which is
 	// keyed by the given hash.
-	NewSecret(context.Context, [sha256.Size]byte) ([lsat.SecretSize]byte,
+	NewSecret(context.Context, [sha256.Size]byte, [sha256.Size]byte) ([lsat.SecretSize]byte,
 		error)
 
 	// GetSecret returns the cryptographically random secret that
@@ -52,6 +55,12 @@ type SecretStore interface {
 	// corresponds to the given hash. This acts as a NOP if the secret does
 	// not exist.
 	RevokeSecret(context.Context, [sha256.Size]byte) error
+
+	// SetSettledAtByPaymentHash records the time the secret was settled.
+	SetSettledAtByPaymentHash(context.Context, [sha256.Size]byte, NullTime) error
+
+	// GetSettledAtByPaymentHash returns the time the secret was settled.
+	GetSettledAtByPaymentHash(context.Context, [sha256.Size]byte) (NullTime, error)
 }
 
 // ServiceLimiter abstracts the source of caveats that should be applied to an
@@ -129,7 +138,7 @@ func (m *Mint) MintL402(ctx context.Context,
 		return nil, "", err
 	}
 	idHash := sha256.Sum256(id)
-	secret, err := m.cfg.Secrets.NewSecret(ctx, idHash)
+	secret, err := m.cfg.Secrets.NewSecret(ctx, idHash, paymentHash)
 	if err != nil {
 		return nil, "", err
 	}

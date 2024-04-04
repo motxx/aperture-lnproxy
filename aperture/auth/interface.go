@@ -49,4 +49,8 @@ type InvoiceChecker interface {
 	// the desired status is set or the given timeout is reached.
 	VerifyInvoiceStatus(lntypes.Hash, lnrpc.Invoice_InvoiceState,
 		time.Duration) error
+
+	// VerifyRightsWithinExpiry checks that the rights for a given L402 are still
+	// valid and within the given expiry duration.
+	VerifyRightsWithinExpiry(lntypes.Hash, time.Duration) error
 }

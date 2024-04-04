@@ -3,6 +3,7 @@ package challenger
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,6 +22,7 @@ import (
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lntypes"
 	"github.com/motxx/aperture-lnproxy/aperture/lnurl"
+	"github.com/motxx/aperture-lnproxy/aperture/mint"
 )
 
 // LnproxyChallenger is a challenger that uses an lnproxy backend to create new L402
@@ -34,6 +36,8 @@ type LnproxyChallenger struct {
 	invoicesMtx    *sync.Mutex
 	invoicesCancel func()
 	invoicesCond   *sync.Cond
+
+	secrets mint.SecretStore
 
 	errChan chan<- error
 
@@ -49,6 +53,7 @@ var _ Challenger = (*LnproxyChallenger)(nil)
 // an lnd backend to create payment challenges.
 func NewLnproxyChallenger(client InvoiceClient,
 	genInvoiceReq InvoiceRequestGenerator,
+	store mint.SecretStore,
 	ctxFunc func() context.Context,
 	errChan chan<- error) (*LnproxyChallenger, error) {
 
@@ -70,6 +75,7 @@ func NewLnproxyChallenger(client InvoiceClient,
 		invoiceStates: make(map[lntypes.Hash]lnrpc.Invoice_InvoiceState),
 		invoicesMtx:   invoicesMtx,
 		invoicesCond:  sync.NewCond(invoicesMtx),
+		secrets:       store,
 		quit:          make(chan struct{}),
 		errChan:       errChan,
 	}
@@ -229,7 +235,7 @@ func (l *LnproxyChallenger) readInvoiceStream(
 			continue
 		}
 
-		hash, err := lntypes.MakeHash(invoice.RHash)
+		paymentHash, err := lntypes.MakeHash(invoice.RHash)
 		if err != nil {
 			log.Errorf("Error parsing invoice hash: %v", err)
 			return
@@ -238,9 +244,15 @@ func (l *LnproxyChallenger) readInvoiceStream(
 		l.invoicesMtx.Lock()
 		if invoiceIrrelevant(invoice) {
 			// Don't keep the state of canceled or expired invoices.
-			delete(l.invoiceStates, hash)
+			delete(l.invoiceStates, paymentHash)
 		} else {
-			l.invoiceStates[hash] = invoice.State
+			l.invoiceStates[paymentHash] = invoice.State
+			if invoice.State == lnrpc.Invoice_SETTLED {
+				err := l.secrets.SetSettledAtByPaymentHash(context.Background(), paymentHash, sql.NullTime{Time: time.Unix(invoice.SettleDate, 0), Valid: true})
+				if err != nil {
+					log.Criticalf("Error setting settled time for hash(%v): %v", paymentHash, err)
+				}
+			}
 		}
 
 		// Before releasing the lock, notify our conditions that listen
@@ -473,4 +485,41 @@ func (l *LnproxyChallenger) VerifyInvoiceStatus(hash lntypes.Hash,
 	default:
 		return nil
 	}
+}
+
+// VerifyRightsWithinExpiry checks that the rights for a given hash are still
+// valid and within the given expiry duration.
+func (l *LnproxyChallenger) VerifyRightsWithinExpiry(paymentHash lntypes.Hash, duration time.Duration) error {
+	settledAt, err := l.secrets.GetSettledAtByPaymentHash(
+		context.Background(), paymentHash,
+	)
+	if err != nil {
+		return err
+	}
+	if !settledAt.Valid {
+		return fmt.Errorf("no settled time found for paymentHash(%v)", paymentHash)
+	}
+
+	expiryTime := settledAt.Time.Add(duration)
+	if expiryTime.Before(time.Now()) {
+		return fmt.Errorf("L402 right expired at %v", expiryTime)
+	}
+	return nil
+}
+
+// invoiceIrrelevant returns true if an invoice is nil, canceled or non-settled
+// and expired.
+func invoiceIrrelevant(invoice *lnrpc.Invoice) bool {
+	if invoice == nil || invoice.State == lnrpc.Invoice_CANCELED {
+		return true
+	}
+
+	creation := time.Unix(invoice.CreationDate, 0)
+	expiration := creation.Add(time.Duration(invoice.Expiry) * time.Second)
+	expired := time.Now().After(expiration)
+
+	notSettled := invoice.State == lnrpc.Invoice_OPEN ||
+		invoice.State == lnrpc.Invoice_ACCEPTED
+
+	return expired && notSettled
 }
