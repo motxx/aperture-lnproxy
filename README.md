@@ -1,6 +1,11 @@
 # Aperture lnproxy
 
-This project offers a dockerized solution for collecting fees on content delivery sites using the Lightning Network. It integrates Aperture, an HTTP 402 reverse proxy, and lnproxy, a wrapped invoice implementation, to enable seamless payment processing.
+コンテンツへの支払のL402 paywallであるapertureと、Wrapped invoiceのlnproxyを組み合わせたdocker composeのコンテナです。コンテンツの料金をクリエイターに支払う一方で、金額の一部をコンテンツ配信サービスを運用する事業者が、手数料として徴収できるようにします。
+
+## Disclaimer
+
+L402とWrapped Invoiceを組み合わせる本リポジトリの方法は、L402の権利となるpreimageを確率的に不正入手する手段が潜在しています。現実的にどの程度不正が可能かは検証できておりません。詳しくは下記をご覧ください。
+https://coinkeninfo.com/wrapped-invoice/
 
 ## Overview
 
