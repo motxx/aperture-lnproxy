@@ -1,15 +1,26 @@
 -- name: InsertSecret :one
 INSERT INTO secrets (
-    hash, secret, created_at
+    macaroon_id_hash, payment_hash, secret, created_at
 ) VALUES (
-    $1, $2, $3
+    $1, $2, $3, $4
 ) RETURNING id;
 
--- name: GetSecretByHash :one
-SELECT secret 
+-- name: GetSecretByIdHash :one
+SELECT secret
 FROM secrets
-WHERE hash = $1;
+WHERE macaroon_id_hash = $1;
 
--- name: DeleteSecretByHash :execrows
+
+-- name: GetSettledAtByPaymentHash :one
+SELECT settled_at
+FROM secrets
+WHERE payment_hash = $1;
+
+-- name: SetSettledAtByPaymentHash :exec
+UPDATE secrets
+SET settled_at = $2
+WHERE payment_hash = $1;
+
+-- name: DeleteSecretByIdHash :execrows
 DELETE FROM secrets
-WHERE hash = $1;
+WHERE macaroon_id_hash = $1;

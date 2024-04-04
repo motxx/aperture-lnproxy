@@ -27,8 +27,10 @@ type Onion struct {
 }
 
 type Secret struct {
-	ID        int32
-	Hash      []byte
-	Secret    []byte
-	CreatedAt time.Time
+	ID             int32
+	MacaroonIDHash []byte
+	PaymentHash    []byte
+	Secret         []byte
+	SettledAt      sql.NullTime
+	CreatedAt      time.Time
 }

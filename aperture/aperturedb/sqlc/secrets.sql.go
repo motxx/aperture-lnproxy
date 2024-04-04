@@ -7,52 +7,88 @@ package sqlc
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
-const deleteSecretByHash = `-- name: DeleteSecretByHash :execrows
+const deleteSecretByIdHash = `-- name: DeleteSecretByIdHash :execrows
 DELETE FROM secrets
-WHERE hash = $1
+WHERE macaroon_id_hash = $1
 `
 
-func (q *Queries) DeleteSecretByHash(ctx context.Context, hash []byte) (int64, error) {
-	result, err := q.db.ExecContext(ctx, deleteSecretByHash, hash)
+func (q *Queries) DeleteSecretByIdHash(ctx context.Context, macaroonIDHash []byte) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteSecretByIdHash, macaroonIDHash)
 	if err != nil {
 		return 0, err
 	}
 	return result.RowsAffected()
 }
 
-const getSecretByHash = `-- name: GetSecretByHash :one
-SELECT secret 
+const getSecretByIdHash = `-- name: GetSecretByIdHash :one
+SELECT secret
 FROM secrets
-WHERE hash = $1
+WHERE macaroon_id_hash = $1
 `
 
-func (q *Queries) GetSecretByHash(ctx context.Context, hash []byte) ([]byte, error) {
-	row := q.db.QueryRowContext(ctx, getSecretByHash, hash)
+func (q *Queries) GetSecretByIdHash(ctx context.Context, macaroonIDHash []byte) ([]byte, error) {
+	row := q.db.QueryRowContext(ctx, getSecretByIdHash, macaroonIDHash)
 	var secret []byte
 	err := row.Scan(&secret)
 	return secret, err
 }
 
+const getSettledAtByPaymentHash = `-- name: GetSettledAtByPaymentHash :one
+SELECT settled_at
+FROM secrets
+WHERE payment_hash = $1
+`
+
+func (q *Queries) GetSettledAtByPaymentHash(ctx context.Context, paymentHash []byte) (sql.NullTime, error) {
+	row := q.db.QueryRowContext(ctx, getSettledAtByPaymentHash, paymentHash)
+	var settled_at sql.NullTime
+	err := row.Scan(&settled_at)
+	return settled_at, err
+}
+
 const insertSecret = `-- name: InsertSecret :one
 INSERT INTO secrets (
-    hash, secret, created_at
+    macaroon_id_hash, payment_hash, secret, created_at
 ) VALUES (
-    $1, $2, $3
+    $1, $2, $3, $4
 ) RETURNING id
 `
 
 type InsertSecretParams struct {
-	Hash      []byte
-	Secret    []byte
-	CreatedAt time.Time
+	MacaroonIDHash []byte
+	PaymentHash    []byte
+	Secret         []byte
+	CreatedAt      time.Time
 }
 
 func (q *Queries) InsertSecret(ctx context.Context, arg InsertSecretParams) (int32, error) {
-	row := q.db.QueryRowContext(ctx, insertSecret, arg.Hash, arg.Secret, arg.CreatedAt)
+	row := q.db.QueryRowContext(ctx, insertSecret,
+		arg.MacaroonIDHash,
+		arg.PaymentHash,
+		arg.Secret,
+		arg.CreatedAt,
+	)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
+}
+
+const setSettledAtByPaymentHash = `-- name: SetSettledAtByPaymentHash :exec
+UPDATE secrets
+SET settled_at = $2
+WHERE payment_hash = $1
+`
+
+type SetSettledAtByPaymentHashParams struct {
+	PaymentHash []byte
+	SettledAt   sql.NullTime
+}
+
+func (q *Queries) SetSettledAtByPaymentHash(ctx context.Context, arg SetSettledAtByPaymentHashParams) error {
+	_, err := q.db.ExecContext(ctx, setSettledAtByPaymentHash, arg.PaymentHash, arg.SettledAt)
+	return err
 }
